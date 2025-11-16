@@ -4,6 +4,6 @@
 [submodule "assets"]
 	path = assets
 	url = https://github.com/prizepun4973/assets
-[submodule "example_mods"]
-	path = example_mods
+[submodule "modTemplate"]
+	path = example_mods/modTemplate
 	url = https://github.com/prizepun4973/modTemplate
