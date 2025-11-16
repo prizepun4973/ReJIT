@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="HAXE_MODULE" version="4">
+  <component name="HaxeModuleSettingsStorage">
+    <option name="buildConfig" value="3" />
+    <option name="openFLPath" value="$MODULE_DIR$/Project.xml" />
+    <option name="outputFolder" value="D:\Documents\Haxe\ReJIT\0.0.0/out" />
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$" />
+    <orderEntry type="jdk" jdkName="Haxe 4.2.5" jdkType="Haxe toolkit" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library name="Haxelib: flixel:5.5.0">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/flixel/5,5,0" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/flixel/5,5,0" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library name="Haxelib: flixel-addons:3.2.0">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/flixel-addons/3,2,0" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/flixel-addons/3,2,0" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library name="Haxelib: hscript:2.6.0">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/hscript/2,6,0" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/hscript/2,6,0" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library name="Haxelib: flixel-ui:2.5.0">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/flixel-ui/2,5,0" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/flixel-ui/2,5,0" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library name="Haxelib: linc_luajit:0.0.8 [git]">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/linc_luajit/git" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/linc_luajit/git" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library name="Haxelib: hxCodec:2.5.1">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/hxcodec/2,5,1" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/hxcodec/2,5,1" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library name="Haxelib: lime:8.1.3">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/lime/8,1,3/src" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/lime/8,1,3/src" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library name="Haxelib: openfl:9.4.2">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/openfl/9,4,2/src" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../../../HaxeToolKit/haxe/lib/openfl/9,4,2/src" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+  </component>
+</module>
