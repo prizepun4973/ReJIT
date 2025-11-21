@@ -306,7 +306,6 @@ class PauseSubState extends BuiltinJITSubState
 	override function destroy()
 	{
 		pauseMusic.destroy();
-
 		super.destroy();
 	}
 

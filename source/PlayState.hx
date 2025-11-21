@@ -1356,6 +1356,8 @@ class PlayState extends MusicBeatState
 		
 		CustomFadeTransition.nextCamera = camOther;
 		if(eventNotes.length < 1) checkEventNote();
+
+		doLostFrames();
 	}
 
 	#if (!flash && sys)
@@ -2306,6 +2308,8 @@ class PlayState extends MusicBeatState
 		vocals.play();
 		Conductor.songPosition = time;
 		songTime = time;
+
+		doLostFrames();
 	}
 
 	function startNextDialogue() {
@@ -2319,7 +2323,7 @@ class PlayState extends MusicBeatState
 
 	var previousFrameTime:Int = 0;
 	var lastReportedPlayheadPosition:Int = 0;
-	var songTime:Float = 0;
+	public var songTime:Float = 0;
 
 	function startSong():Void
 	{
@@ -5230,6 +5234,19 @@ class PlayState extends MusicBeatState
 		setOnLuas('ratingFC', ratingFC);
 	}
 
+	private function doLostFrames() {
+		updateCurStep();
+		trace(curStep);
+		if (luaArray.length > 0) {
+			for (i in 0...(curStep + 1)) {
+				setOnLuas("curStep", i);
+				setOnLuas("curBeat", Math.floor(i / 4));
+				callOnLuas("onStepHit", [curStep]);
+				callOnLuas("onBeatHit", [Math.floor(i / 4)]);
+			}
+		}
+	}
+
 	#if ACHIEVEMENTS_ALLOWED
 	private function checkForAchievement(achievesToCheck:Array<String> = null):String
 	{
@@ -5302,4 +5319,58 @@ class PlayState extends MusicBeatState
 
 	var curLight:Int = -1;
 	var curLightEvent:Int = -1;
+}
+
+class ModchartSprite extends FlxSprite
+{
+	public var wasAdded:Bool = false;
+	public var animOffsets:Map<String, Array<Float>> = new Map<String, Array<Float>>();
+
+	// public var isInFront:Bool = false;
+
+	public function new(?x:Float = 0, ?y:Float = 0)
+	{
+		super(x, y);
+		antialiasing = ClientPrefs.globalAntialiasing;
+	}
+}
+
+class ModchartText extends FlxText
+{
+	public var wasAdded:Bool = false;
+
+	public function new(x:Float, y:Float, text:String, width:Float)
+	{
+		super(x, y, width, text, 16);
+		setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		cameras = [PlayState.instance.camHUD];
+		scrollFactor.set();
+		borderSize = 2;
+	}
+}
+
+class DebugLuaText extends FlxText
+{
+	private var disableTime:Float = 6;
+
+	public var parentGroup:FlxTypedGroup<DebugLuaText>;
+
+	public function new(text:String, parentGroup:FlxTypedGroup<DebugLuaText>, color:FlxColor)
+	{
+		this.parentGroup = parentGroup;
+		super(10, 10, 0, text, 16);
+		setFormat(Paths.font("vcr.ttf"), 16, color, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		scrollFactor.set();
+		borderSize = 1;
+	}
+
+	override function update(elapsed:Float)
+	{
+		super.update(elapsed);
+		disableTime -= elapsed;
+		if (disableTime < 0)
+			disableTime = 0;
+		if (disableTime < 1)
+			alpha = disableTime;
+	}
 }
