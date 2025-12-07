@@ -46,7 +46,7 @@ class Conductor
 		return data[data.length - 1];
 	}
 
-	public static function getCrotchetAtTime(time:Float){
+	public static function getCrochetAtTime(time:Float){
 		var lastChange = getBPMFromSeconds(time);
 		return lastChange.stepCrochet*4;
 	}
@@ -132,7 +132,7 @@ class Conductor
 			totalSteps += deltaSteps;
 			totalPos += ((60 / curBPM) * 1000 / 4) * deltaSteps;
 		}
-		trace("new BPM map BUDDY " + bpmChangeMap);
+		trace("new BPM map: " + bpmChangeMap);
 	}
 
 	static function getSectionBeats(song:SwagSong, section:Int)

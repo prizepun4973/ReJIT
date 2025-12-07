@@ -13,10 +13,10 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
-#if MODS_ALLOWED
+
 import sys.FileSystem;
 import sys.io.File;
-#end
+
 import lime.utils.Assets;
 
 import funkin.jit.BuiltinJITState;
@@ -64,7 +64,6 @@ class CreditsState extends BuiltinJITState
 		grpOptions = new FlxTypedGroup<Alphabet>();
 		add(grpOptions);
 
-		#if MODS_ALLOWED
 		var path:String = 'modsList.txt';
 		if(FileSystem.exists(path))
 		{
@@ -90,7 +89,6 @@ class CreditsState extends BuiltinJITState
 		{
 			pushModCreditsToList(folder);
 		}
-		#end
 
 		var pisspoop:Array<Array<String>> = [ //Name - Icon name - Description - Link - BG Color
 			['Psych Engine Team'],
@@ -115,7 +113,9 @@ class CreditsState extends BuiltinJITState
 			['ninjamuffin99',		'ninjamuffin99',	"Programmer of Friday Night Funkin'",							'https://twitter.com/ninja_muffin99',	'CF2D2D'],
 			['PhantomArcade',		'phantomarcade',	"Animator of Friday Night Funkin'",								'https://twitter.com/PhantomArcade3K',	'FADC45'],
 			['evilsk8r',			'evilsk8r',			"Artist of Friday Night Funkin'",								'https://twitter.com/evilsk8r',			'5ABD4B'],
-			['kawaisprite',			'kawaisprite',		"Composer of Friday Night Funkin'",								'https://twitter.com/kawaisprite',		'378FC7']
+			['kawaisprite',			'kawaisprite',		"Composer of Friday Night Funkin'",								'https://twitter.com/kawaisprite',		'378FC7'],
+			['Donate'],
+			['DONATE',              'ninjamuffin99',    'donate',                                                       'https://ninja-muffin24.itch.io/funkin','FFFFFF']
 		];
 		
 		for(i in pisspoop){
@@ -133,11 +133,6 @@ class CreditsState extends BuiltinJITState
 			grpOptions.add(optionText);
 
 			if(isSelectable) {
-				if(creditsStuff[i][5] != null)
-				{
-					Paths.currentModDirectory = creditsStuff[i][5];
-				}
-
 				var icon:AttachedSprite = new AttachedSprite('credits/' + creditsStuff[i][1]);
 				icon.xAdd = optionText.width + 10;
 				icon.sprTracker = optionText;
@@ -145,7 +140,6 @@ class CreditsState extends BuiltinJITState
 				// using a FlxGroup is too much fuss!
 				iconArray.push(icon);
 				add(icon);
-				Paths.currentModDirectory = '';
 
 				if(curSelected == -1) curSelected = i;
 			}
@@ -310,7 +304,6 @@ class CreditsState extends BuiltinJITState
 		descBox.updateHitbox();
 	}
 
-	#if MODS_ALLOWED
 	private var modsAdded:Array<String> = [];
 	function pushModCreditsToList(folder:String)
 	{
@@ -333,7 +326,6 @@ class CreditsState extends BuiltinJITState
 		}
 		modsAdded.push(folder);
 	}
-	#end
 
 	function getCurrentBGColor() {
 		var bgColor:String = creditsStuff[curSelected][4];

@@ -24,7 +24,7 @@ import openfl.display.BlendMode;
 import animateatlas.AtlasFrameMaker;
 import flixel.FlxState;
 
-import funkin.options.substates.*;
+import funkin.options.menu.*;
 import funkin.menu.*;
 import funkin.component.*;
 
@@ -50,12 +50,12 @@ class LuaObject
 		LuaL.openlibs(lua);
 		Lua.init_callbacks(lua);
 
-		if (!FileSystem.exists(Paths.getStateLua('', script))) {
+		if (!FileSystem.exists(Paths.getStateLua(script))) {
 			lua = null;
 			return;
 		}
 
-        var result:Dynamic = LuaL.dofile(lua, Paths.getStateLua('', script));
+        var result:Dynamic = LuaL.dofile(lua, Paths.getStateLua(script));
 		var resultStr:String = Lua.tostring(lua, result);
 
 		if (resultStr != null && result != 0) {
@@ -245,8 +245,6 @@ class LuaObject
 	// ur stuff
 	function getState(state:String):FlxState {
 		switch(state) {
-			case "AchievementsMenuState":
-				return new AchievementsMenuState();
 			case "CreditsState":
 				return new CreditsState();
 			case "FlashingState":
@@ -255,8 +253,6 @@ class LuaObject
 				return new FreeplayState();
 			case "MainMenuState":
 				return new MainMenuState();
-			case "ModsMenuState":
-				return new ModsMenuState();
 			case "StoryMenuState":
 				return new StoryMenuState();
 			case "TitleState":
@@ -472,16 +468,12 @@ class LuaObject
 					// 	target = new ResetScoreSubState();
 					case "ControlsSubState":
 						target = new ControlsSubState();
-					case "NotesSubState":
-						target = new NotesSubState();
 					case "BaseOptionsMenu":
 						target = new BaseOptionsMenu();
 					case "GameplaySettingsSubState":
 						target = new GameplaySettingsSubState();
 					case "GraphicsSettingsSubState":
 						target = new GraphicsSettingsSubState();
-					case "VisualsUISubState":
-						target = new VisualsUISubState();
 				}
 				parent.openSubState(target);
 			}

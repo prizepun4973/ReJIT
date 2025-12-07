@@ -1359,13 +1359,16 @@ class ChartingState extends MusicBeatState
 		}
 
 		vocals = new FlxSound();
-		if (FileSystem.exists("${formatToSongPath(currentSongName)}/Voices.ogg")){
-			var file:Dynamic = Paths.voices(currentSongName);
+		if (FileSystem.exists('assets/songs/${Paths.formatToSongPath(_song.song)}/Voices.ogg') || FileSystem.exists('${Paths.modFolders("songs/")}${Paths.formatToSongPath(_song.song)}/Voices.ogg')){
+			var file:Dynamic = Paths.voices(_song.song);
 			if (Std.isOfType(file, Sound) || OpenFlAssets.exists(file)) {
 				vocals.loadEmbedded(file);
 				FlxG.sound.list.add(vocals);
 			}
 		}
+        vocals.play();
+        vocals.pause();
+		
 		generateSong();
 		FlxG.sound.music.pause();
 		Conductor.songPosition = sectionStartTime();

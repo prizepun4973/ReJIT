@@ -25,7 +25,7 @@ class PauseSubState extends BuiltinJITSubState
 	var grpMenuShit:FlxTypedGroup<Alphabet>;
 
 	var menuItems:Array<String> = [];
-	var menuItemsOG:Array<String> = ['Resume', 'Restart Song', 'Change Difficulty', 'Exit to menu'];
+	var menuItemsOG:Array<String> = ['Resume', 'Restart Song', 'Options', 'Change Difficulty', 'Exit to menu'];
 	var difficultyChoices = [];
 	var curSelected:Int = 0;
 
@@ -219,6 +219,9 @@ class PauseSubState extends BuiltinJITSubState
 			{
 				case "Resume":
 					close();
+				case "Options":
+					MusicBeatState.switchState(new funkin.options.OptionsState(new PlayState()));
+					FlxG.sound.playMusic(Paths.music('freakyMenu'), 1, true);
 				case 'Change Difficulty':
 					menuItems = difficultyChoices;
 					deleteSkipTimeText();

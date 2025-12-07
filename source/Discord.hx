@@ -139,7 +139,6 @@ class DiscordClient
 		#end
 	}
 
-	#if MODS_ALLOWED
 	public static function loadModRPC()
 	{
 		#if hxdiscord_rpc
@@ -151,9 +150,7 @@ class DiscordClient
 		}
 		#end
 	}
-	#end
 
-	#if LUA_ALLOWED
 	public static function addLuaCallbacks(lua:State) {
 		#if hxdiscord_rpc
 		Lua_helper.add_callback(lua, "changeDiscordPresence", function(details:String, state:Null<String>, ?smallImageKey:String, ?hasStartTimestamp:Bool, ?endTimestamp:Float) {
@@ -166,5 +163,4 @@ class DiscordClient
 		});
 		#end
 	}
-	#end
 }

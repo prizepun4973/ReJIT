@@ -1,4 +1,4 @@
-package funkin.options.substates;
+package funkin.options.menu;
 
 #if desktop
 import Discord.DiscordClient;
@@ -57,6 +57,9 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 			'shaders', //Save data variable name
 			'bool', //Variable type
 			true); //Default value
+		addOption(option);
+
+		var option:Option = new Option('Flashing Lights', "Uncheck this if you're sensitive to flashing lights!", 'flashing', 'bool', true);
 		addOption(option);
 
 		#if !html5 //Apparently other framerates isn't correctly supported on Browser? Probably it has some V-Sync shit enabled by default, idk

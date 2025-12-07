@@ -1,4 +1,4 @@
-package funkin.options;
+package funkin.options.menu;
 
 import funkin.jit.BuiltinJITState;
 import funkin.jit.LuaObject;
@@ -11,6 +11,7 @@ import flixel.group.FlxSpriteGroup;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.util.FlxColor;
 import flixel.FlxSprite;
+import flixel.FlxState;
 import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.ui.FlxBar;
@@ -19,6 +20,8 @@ import flixel.math.FlxPoint;
 import funkin.component.*;
 import funkin.game.component.*;
 import funkin.game.component.bg.BGSprite;
+
+import funkin.options.OptionsState;
 
 using StringTools;
 
@@ -47,8 +50,11 @@ class NoteOffsetState extends BuiltinJITState
 
 	var changeModeText:FlxText;
 
-	public function new() {
+	var parent:FlxState;
+
+	public function new(parent:FlxState) {
 		super("NoteOffsetState");
+		this.parent = parent;
 	}
 
 	override public function create()
@@ -371,7 +377,8 @@ class NoteOffsetState extends BuiltinJITState
 
 			persistentUpdate = false;
 			CustomFadeTransition.nextCamera = camOther;
-			MusicBeatState.switchState(new funkin.options.OptionsState());
+			if (Std.isOfType(parent, PlayState)) MusicBeatState.switchState(new OptionsState(new PlayState()));
+			else MusicBeatState.switchState(new OptionsState(new funkin.menu.MainMenuState()));
 			FlxG.sound.playMusic(Paths.music('freakyMenu'), 1, true);
 			FlxG.mouse.visible = false;
 		}

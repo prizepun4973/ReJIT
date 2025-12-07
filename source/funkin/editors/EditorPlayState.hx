@@ -115,7 +115,7 @@ class EditorPlayState extends MusicBeatState
 			vocals = new FlxSound();
 
 		generateSong(PlayState.SONG.song);
-		#if (LUA_ALLOWED && MODS_ALLOWED)
+
 		for (notetype in noteTypeMap.keys()) {
 			var luaToLoad:String = Paths.modFolders('custom_notetypes/' + notetype + '.lua');
 			if(sys.FileSystem.exists(luaToLoad)) {
@@ -126,7 +126,7 @@ class EditorPlayState extends MusicBeatState
 				});
 			}
 		}
-		#end
+		
 		noteTypeMap.clear();
 		noteTypeMap = null;
 
@@ -243,7 +243,7 @@ class EditorPlayState extends MusicBeatState
 						swagNote.mustPress = gottaHitNote;
 						swagNote.sustainLength = songNotes[2];
 						swagNote.noteType = songNotes[3];
-						if(!Std.isOfType(songNotes[3], String)) swagNote.noteType = funkin.editors.ChartingState.noteTypeList[songNotes[3]]; //Backward compatibility + compatibility with Week 7 charts
+						if(!Std.isOfType(songNotes[3], String)) swagNote.noteType = ''; //Backward compatibility + compatibility with Week 7 charts
 						swagNote.scrollFactor.set();
 
 						var susLength:Float = swagNote.sustainLength;

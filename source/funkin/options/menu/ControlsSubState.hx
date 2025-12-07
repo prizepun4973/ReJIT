@@ -1,4 +1,4 @@
-package funkin.options.substates;
+package funkin.options.menu;
 
 import funkin.jit.BuiltinJITSubState;
 #if desktop

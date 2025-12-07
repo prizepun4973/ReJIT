@@ -1,4 +1,4 @@
-package funkin.menu;
+package funkin.options.menu;
 
 #if desktop
 import Discord.DiscordClient;
@@ -6,6 +6,7 @@ import Discord.DiscordClient;
 import flash.text.TextField;
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.FlxState;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.addons.ui.FlxButtonPlus;
@@ -35,6 +36,7 @@ import funkin.jit.BuiltinJITState;
 import funkin.jit.LuaObject;
 
 import funkin.component.*;
+import funkin.menu.*;
 
 using StringTools;
 
@@ -69,8 +71,11 @@ class ModsMenuState extends BuiltinJITState
 	var visibleWhenNoMods:Array<FlxBasic> = [];
 	var visibleWhenHasMods:Array<FlxBasic> = [];
 
-	public function new() {
+	var parent:FlxState;
+
+	public function new(parent:FlxState) {
 		super("ModsMenuState");
+		this.parent = parent;
 	}
 
 	override function create()
@@ -78,7 +83,6 @@ class ModsMenuState extends BuiltinJITState
 
 		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
-		WeekData.setDirectoryFromWeek();
 
 		#if desktop
 		// Updating Discord Rich Presence
@@ -93,7 +97,6 @@ class ModsMenuState extends BuiltinJITState
 		bg.screenCenter();
 
 		noModsTxt = new FlxText(0, 0, FlxG.width, "NO MODS INSTALLED\nPRESS BACK TO EXIT AND INSTALL A MOD", 48);
-		if(FlxG.random.bool(0.1)) noModsTxt.text += '\nBITCH.'; //meanie
 		noModsTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		noModsTxt.scrollFactor.set();
 		noModsTxt.borderSize = 2;
@@ -511,7 +514,8 @@ class ModsMenuState extends BuiltinJITState
 			}
 			else
 			{
-				MusicBeatState.switchState(new MainMenuState());
+				if (Std.isOfType(parent, PlayState)) MusicBeatState.switchState(new OptionsState(new PlayState()));
+				else MusicBeatState.switchState(new OptionsState(new funkin.menu.MainMenuState()));
 			}
 		}
 

@@ -114,7 +114,7 @@ class StoryMenuState extends BuiltinJITState
 			if(!isLocked || !weekFile.hiddenUntilUnlocked)
 			{
 				loadedWeeks.push(weekFile);
-				WeekData.setDirectoryFromWeek(weekFile);
+				// WeekData.setDirectoryFromWeek(weekFile);
 				var weekThing:MenuItem = new MenuItem(0, bgSprite.y + 396, WeekData.weeksList[i]);
 				weekThing.y += ((weekThing.height + 20) * num);
 				weekThing.targetY = num;
@@ -139,7 +139,7 @@ class StoryMenuState extends BuiltinJITState
 			}
 		}
 
-		WeekData.setDirectoryFromWeek(loadedWeeks[0]);
+		// WeekData.setDirectoryFromWeek(loadedWeeks[0]);
 		var charArray:Array<String> = loadedWeeks[0].weekCharacters;
 		for (char in 0...3)
 		{
@@ -324,6 +324,9 @@ class StoryMenuState extends BuiltinJITState
 
 			// We can't use Dynamic Array .copy() because that crashes HTML5, here's a workaround.
 			var songArray:Array<String> = [];
+
+			WeekData.setDirectoryFromWeek(loadedWeeks[curWeek]);
+
 			var leWeek:Array<Dynamic> = loadedWeeks[curWeek].songs;
 			for (i in 0...leWeek.length) {
 				songArray.push(leWeek[i][0]);
@@ -362,7 +365,7 @@ class StoryMenuState extends BuiltinJITState
 		if (curDifficulty >= CoolUtil.difficulties.length)
 			curDifficulty = 0;
 
-		WeekData.setDirectoryFromWeek(loadedWeeks[curWeek]);
+		// WeekData.setDirectoryFromWeek(loadedWeeks[curWeek]);
 
 		var diff:String = CoolUtil.difficulties[curDifficulty];
 		var newImage:FlxGraphic = Paths.image('menudifficulties/' + Paths.formatToSongPath(diff));
@@ -402,7 +405,7 @@ class StoryMenuState extends BuiltinJITState
 			curWeek = loadedWeeks.length - 1;
 
 		var leWeek:WeekData = loadedWeeks[curWeek];
-		WeekData.setDirectoryFromWeek(leWeek);
+		// WeekData.setDirectoryFromWeek(leWeek);
 
 		var leName:String = leWeek.storyName;
 		txtWeekTitle.text = leName.toUpperCase();

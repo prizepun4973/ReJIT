@@ -1,4 +1,4 @@
-package funkin.options.substates;
+package funkin.options.menu;
 
 #if desktop
 import Discord.DiscordClient;
@@ -89,6 +89,43 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		option.decimals = 1;
 		option.onChange = onChangeHitsoundVolume;
 
+		var option:Option = new Option('Pause Screen Song:', "What song do you prefer for the Pause Screen?", 'pauseMusic', 'string', 'Tea Time',
+			['None', 'Breakfast', 'Tea Time']);
+		addOption(option);
+		option.onChange = onChangePauseMusic;
+
+		var option:Option = new Option('Combo Stacking',
+			"If unchecked, Ratings and Combo won't stack, saving on System Memory and making them easier to read",
+			'comboStacking',
+			'bool',
+			true);
+		addOption(option);
+
+		var option:Option = new Option('Note Splashes', "If unchecked, hitting \"Sick!\" notes won't show particles.", 'noteSplashes', 'bool', true);
+		addOption(option);
+
+		var option:Option = new Option('Hide HUD', 'If checked, hides most HUD elements.', 'hideHud', 'bool', false);
+		addOption(option);
+
+		var option:Option = new Option('Time Bar:', "What should the Time Bar display?", 'timeBarType', 'string', 'Time Left',
+			['Time Left', 'Time Elapsed', 'Song Name', 'Disabled']);
+		addOption(option);
+
+		var option:Option = new Option('Camera Zooms', "If unchecked, the camera won't zoom in on a beat hit.", 'camZooms', 'bool', true);
+		addOption(option);
+
+		var option:Option = new Option('Score Text Zoom on Hit', "If unchecked, disables the Score text zooming\neverytime you hit a note.", 'scoreZoom',
+			'bool', true);
+		addOption(option);
+
+		var option:Option = new Option('Health Bar Transparency', 'How much transparent should the health bar and icons be.', 'healthBarAlpha', 'percent', 1);
+		option.scrollSpeed = 1.6;
+		option.minValue = 0.0;
+		option.maxValue = 1;
+		option.changeValue = 0.1;
+		option.decimals = 1;
+		addOption(option);
+
 		var option:Option = new Option('Rating Offset',
 			'Changes how late/early you have to hit for a "Sick!"\nHigher values mean you have to hit later.',
 			'ratingOffset',
@@ -145,6 +182,35 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		addOption(option);
 
 		super();
+	}
+
+	override function destroy()
+	{
+		if(changedMusic) FlxG.sound.playMusic(Paths.music('freakyMenu'));
+		super.destroy();
+	}
+
+	function onChangeAntiAliasing()
+	{
+		for (sprite in members)
+		{
+			var sprite:Dynamic = sprite; //Make it check for FlxSprite instead of FlxBasic
+			var sprite:FlxSprite = sprite; //Don't judge me ok
+			if(sprite != null && (sprite is FlxSprite) && !(sprite is FlxText)) {
+				sprite.antialiasing = ClientPrefs.globalAntialiasing;
+			}
+		}
+	}
+
+	var changedMusic:Bool = false;
+	function onChangePauseMusic()
+	{
+		if(ClientPrefs.pauseMusic == 'None')
+			FlxG.sound.music.volume = 0;
+		else
+			FlxG.sound.playMusic(Paths.music(Paths.formatToSongPath(ClientPrefs.pauseMusic)));
+
+		changedMusic = true;
 	}
 
 	function onChangeHitsoundVolume()

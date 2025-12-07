@@ -41,7 +41,6 @@ import openfl.display.BlendMode;
 import openfl.display.StageQuality;
 import openfl.filters.BitmapFilter;
 import openfl.utils.Assets as OpenFlAssets;
-import funkin.editors.ChartingState;
 import funkin.editors.CharacterEditorState;
 import flixel.group.FlxSpriteGroup;
 import flixel.input.keyboard.FlxKey;
@@ -51,6 +50,8 @@ import flixel.effects.particles.FlxParticle;
 import flixel.util.FlxSave;
 import flixel.animation.FlxAnimationController;
 import animateatlas.AtlasFrameMaker;
+
+import sys.FileSystem;
 
 import Conductor.Rating;
 
@@ -84,8 +85,6 @@ import funkin.game.component.Note.EventNote;
 import funkin.game.component.cutscene.DialogueBoxPsych.DialogueFile;
 import funkin.game.data.StageData.StageFile;
 import funkin.menu.*;
-
-import Achievements.AchievementObject;
 
 using StringTools;
 
@@ -872,25 +871,20 @@ class PlayState extends MusicBeatState
 				add(foregroundSprites);
 		}
 
-		#if LUA_ALLOWED
 		luaDebugGroup = new FlxTypedGroup<DebugLuaText>();
 		luaDebugGroup.cameras = [camOther];
 		add(luaDebugGroup);
-		#end
 
 		// "GLOBAL" SCRIPTS
-		#if LUA_ALLOWED
 		var filesPushed:Array<String> = [];
 		var foldersToCheck:Array<String> = [Paths.getPreloadPath('scripts/')];
 
-		#if MODS_ALLOWED
 		foldersToCheck.insert(0, Paths.mods('scripts/'));
 		if(Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0)
 			foldersToCheck.insert(0, Paths.mods(Paths.currentModDirectory + '/scripts/'));
 
 		for(mod in Paths.getGlobalMods())
 			foldersToCheck.insert(0, Paths.mods(mod + '/scripts/'));
-		#end
 
 		for (folder in foldersToCheck)
 		{
@@ -906,12 +900,9 @@ class PlayState extends MusicBeatState
 				}
 			}
 		}
-		#end
 
 		// STAGE SCRIPTS
-		#if (MODS_ALLOWED && LUA_ALLOWED)
 		startLuasOnFolder('stages/' + curStage + '.lua');
-		#end
 
 		var gfVersion:String = SONG.gfVersion;
 		if(gfVersion == null || gfVersion.length < 1)
@@ -1182,7 +1173,6 @@ class PlayState extends MusicBeatState
 		// cameras = [FlxG.cameras.list[1]];
 		startingSong = true;
 		
-		#if LUA_ALLOWED
 		for (notetype in noteTypeMap.keys())
 		{
 			startLuasOnFolder('custom_notetypes/' + notetype + '.lua');
@@ -1191,7 +1181,7 @@ class PlayState extends MusicBeatState
 		{
 			startLuasOnFolder('custom_events/' + event + '.lua');
 		}
-		#end
+
 		noteTypeMap.clear();
 		noteTypeMap = null;
 		eventPushedMap.clear();
@@ -1204,18 +1194,15 @@ class PlayState extends MusicBeatState
 		}
 
 		// SONG SPECIFIC SCRIPTS
-		#if LUA_ALLOWED
 		var filesPushed:Array<String> = [];
 		var foldersToCheck:Array<String> = [Paths.getPreloadPath('data/' + Paths.formatToSongPath(SONG.song) + '/')];
 
-		#if MODS_ALLOWED
 		foldersToCheck.insert(0, Paths.mods('data/' + Paths.formatToSongPath(SONG.song) + '/'));
 		if(Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0)
 			foldersToCheck.insert(0, Paths.mods(Paths.currentModDirectory + '/data/' + Paths.formatToSongPath(SONG.song) + '/'));
 
 		for(mod in Paths.getGlobalMods())
 			foldersToCheck.insert(0, Paths.mods(mod + '/data/' + Paths.formatToSongPath(SONG.song) + '/' ));// using push instead of insert because these should run after everything else
-		#end
 
 		for (folder in foldersToCheck)
 		{
@@ -1231,7 +1218,6 @@ class PlayState extends MusicBeatState
 				}
 			}
 		}
-		#end
 
 		var daSong:String = Paths.formatToSongPath(curSong);
 		if (isStoryMode && !seenCutscene)
@@ -1367,7 +1353,7 @@ class PlayState extends MusicBeatState
 	{
 		if(!ClientPrefs.shaders) return new FlxRuntimeShader();
 
-		#if (!flash && MODS_ALLOWED && sys)
+		#if (!flash && sys)
 		if(!runtimeShaders.exists(name) && !initLuaShader(name))
 		{
 			FlxG.log.warn('Shader $name is missing!');
@@ -1462,7 +1448,6 @@ class PlayState extends MusicBeatState
 	}
 
 	public function addTextToDebug(text:String, color:FlxColor) {
-		#if LUA_ALLOWED
 		luaDebugGroup.forEachAlive(function(spr:DebugLuaText) {
 			spr.y += 20;
 		});
@@ -1473,7 +1458,6 @@ class PlayState extends MusicBeatState
 			luaDebugGroup.remove(blah);
 		}
 		luaDebugGroup.insert(0, new DebugLuaText(text, luaDebugGroup, color));
-		#end
 	}
 
 	public function reloadHealthBarColors() {
@@ -1520,10 +1504,9 @@ class PlayState extends MusicBeatState
 
 	function startCharacterLua(name:String)
 	{
-		#if LUA_ALLOWED
 		var doPush:Bool = false;
 		var luaFile:String = 'characters/' + name + '.lua';
-		#if MODS_ALLOWED
+
 		if(FileSystem.exists(Paths.modFolders(luaFile))) {
 			luaFile = Paths.modFolders(luaFile);
 			doPush = true;
@@ -1533,12 +1516,11 @@ class PlayState extends MusicBeatState
 				doPush = true;
 			}
 		}
-		#else
+
 		luaFile = Paths.getPreloadPath(luaFile);
 		if(Assets.exists(luaFile)) {
 			doPush = true;
 		}
-		#end
 
 		if(doPush)
 		{
@@ -1548,7 +1530,6 @@ class PlayState extends MusicBeatState
 			}
 			luaArray.push(new FunkinLua(luaFile));
 		}
-		#end
 	}
 
 	public function getLuaObject(tag:String, text:Bool=true):FlxSprite {
@@ -2273,7 +2254,7 @@ class PlayState extends MusicBeatState
 		+ ' | Misses: ' + songMisses
 		+ ' | Rating: ' + ratingName
 		+ (ratingName != '?' ? ' (${Highscore.floorDecimal(ratingPercent * 100, 2)}%) - $ratingFC' : '');
-
+ 
 		if(ClientPrefs.scoreZoom && !miss && !cpuControlled)
 		{
 			if(scoreTxtTween != null) {
@@ -2423,11 +2404,8 @@ class PlayState extends MusicBeatState
 
 		var songName:String = Paths.formatToSongPath(SONG.song);
 		var file:String = Paths.json(songName + '/events');
-		#if MODS_ALLOWED
+		
 		if (FileSystem.exists(Paths.modsJson(songName + '/events')) || FileSystem.exists(file)) {
-		#else
-		if (OpenFlAssets.exists(file)) {
-		#end
 			var eventsData:Array<Dynamic> = Song.loadFromJson('events', songName).events;
 			for (event in eventsData) //Event Notes
 			{
@@ -2471,7 +2449,7 @@ class PlayState extends MusicBeatState
 				swagNote.sustainLength = songNotes[2];
 				swagNote.gfNote = (section.gfSection && (songNotes[1]<4));
 				swagNote.noteType = songNotes[3];
-				if(!Std.isOfType(songNotes[3], String)) swagNote.noteType = funkin.editors.ChartingState.noteTypeList[songNotes[3]]; //Backward compatibility + compatibility with Week 7 charts
+				if(!Std.isOfType(songNotes[3], String)) swagNote.noteType = ''; //Backward compatibility + compatibility with Week 7 charts
 
 				swagNote.scrollFactor.set();
 
@@ -3323,7 +3301,7 @@ class PlayState extends MusicBeatState
 		persistentUpdate = false;
 		paused = true;
 		cancelMusicFadeTween();
-		MusicBeatState.switchState(new ChartingState());
+		MusicBeatState.switchState(new funkin.editors.chart.ChartEditorState());
 		chartingMode = true;
 
 		#if desktop
@@ -3895,20 +3873,6 @@ class PlayState extends MusicBeatState
 		deathCounter = 0;
 		seenCutscene = false;
 
-		#if ACHIEVEMENTS_ALLOWED
-		if(achievementObj != null) {
-			return;
-		} else {
-			var achieve:String = checkForAchievement(['week1_nomiss', 'week2_nomiss', 'week3_nomiss', 'week4_nomiss',
-				'week5_nomiss', 'week6_nomiss', 'week7_nomiss', 'ur_bad',
-				'ur_good', 'hype', 'two_keys', 'toastie', 'debugger']);
-
-			if(achieve != null) {
-				startAchievement(achieve);
-				return;
-			}
-		}
-		#end
 
 		var ret:Dynamic = callOnLuas('onEndSong', [], false);
 		if(ret != FunkinLua.Function_Stop && !transitioning) {
@@ -4014,23 +3978,6 @@ class PlayState extends MusicBeatState
 			transitioning = true;
 		}
 	}
-
-	#if ACHIEVEMENTS_ALLOWED
-	var achievementObj:AchievementObject = null;
-	function startAchievement(achieve:String) {
-		achievementObj = new AchievementObject(achieve, camOther);
-		achievementObj.onFinish = achievementEnd;
-		add(achievementObj);
-		trace('Giving achievement ' + achieve);
-	}
-	function achievementEnd():Void
-	{
-		achievementObj = null;
-		if(endingSong && !inCutscene) {
-			endSong();
-		}
-	}
-	#end
 
 	public function KillNotes() {
 		while(notes.length > 0) {
@@ -4435,15 +4382,7 @@ class PlayState extends MusicBeatState
 				}
 			});
 
-			if (parsedHoldArray.contains(true) && !endingSong) {
-				#if ACHIEVEMENTS_ALLOWED
-				var achieve:String = checkForAchievement(['oversinging']);
-				if (achieve != null) {
-					startAchievement(achieve);
-				}
-				#end
-			}
-			else if (boyfriend.animation.curAnim != null && boyfriend.holdTimer > Conductor.stepCrochet * (0.0011 / FlxG.sound.music.pitch) * boyfriend.singDuration && boyfriend.animation.curAnim.name.startsWith('sing') && !boyfriend.animation.curAnim.name.endsWith('miss'))
+			if (boyfriend.animation.curAnim != null && boyfriend.holdTimer > Conductor.stepCrochet * (0.0011 / FlxG.sound.music.pitch) * boyfriend.singDuration && boyfriend.animation.curAnim.name.startsWith('sing') && !boyfriend.animation.curAnim.name.endsWith('miss'))
 			{
 				boyfriend.dance();
 				//boyfriend.animation.curAnim.finish();
@@ -4887,18 +4826,6 @@ class PlayState extends MusicBeatState
 				limoCorpse.visible = false;
 				limoCorpseTwo.visible = false;
 				limoKillingState = 1;
-
-				#if ACHIEVEMENTS_ALLOWED
-				Achievements.henchmenDeath++;
-				FlxG.save.data.henchmenDeath = Achievements.henchmenDeath;
-				var achieve:String = checkForAchievement(['roadkill_enthusiast']);
-				if (achieve != null) {
-					startAchievement(achieve);
-				} else {
-					FlxG.save.flush();
-				}
-				FlxG.log.add('Deaths: ' + Achievements.henchmenDeath);
-				#end
 			}
 		}
 	}
@@ -5110,7 +5037,6 @@ class PlayState extends MusicBeatState
 		callOnLuas('onSectionHit', []);
 	}
 
-	#if LUA_ALLOWED
 	public function startLuasOnFolder(luaFile:String)
 	{
 		for (script in luaArray)
@@ -5118,7 +5044,6 @@ class PlayState extends MusicBeatState
 			if(script.scriptName == luaFile) return false;
 		}
 
-		#if MODS_ALLOWED
 		var luaToLoad:String = Paths.modFolders(luaFile);
 		if(FileSystem.exists(luaToLoad))
 		{
@@ -5134,21 +5059,12 @@ class PlayState extends MusicBeatState
 				return true;
 			}
 		}
-		#elseif sys
-		var luaToLoad:String = Paths.getPreloadPath(luaFile);
-		if(OpenFlAssets.exists(luaToLoad))
-		{
-			luaArray.push(new FunkinLua(luaToLoad));
-			return true;
-		}
-		#end
 		return false;
 	}
-	#end
 
 	public function callOnLuas(event:String, args:Array<Dynamic>, ignoreStops = true, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
 		var returnVal = FunkinLua.Function_Continue;
-		#if LUA_ALLOWED
+
 		if(exclusions == null) exclusions = [];
 		if(excludeValues == null) excludeValues = [];
 
@@ -5164,16 +5080,14 @@ class PlayState extends MusicBeatState
 				returnVal = myValue;
 			}
 		}
-		#end
+
 		return returnVal;
 	}
 
 	public function setOnLuas(variable:String, arg:Dynamic) {
-		#if LUA_ALLOWED
 		for (i in 0...luaArray.length) {
 			luaArray[i].set(variable, arg);
 		}
-		#end
 	}
 
 	function StrumPlayAnim(isDad:Bool, id:Int, time:Float) {
@@ -5296,76 +5210,6 @@ class PlayState extends MusicBeatState
 			}
 		}
 	}
-
-	#if ACHIEVEMENTS_ALLOWED
-	private function checkForAchievement(achievesToCheck:Array<String> = null):String
-	{
-		if(chartingMode) return null;
-
-		var usedPractice:Bool = (ClientPrefs.getGameplaySetting('practice', false) || ClientPrefs.getGameplaySetting('botplay', false));
-		for (i in 0...achievesToCheck.length) {
-			var achievementName:String = achievesToCheck[i];
-			if(!Achievements.isAchievementUnlocked(achievementName) && !cpuControlled) {
-				var unlock:Bool = false;
-				
-				if (achievementName.contains(WeekData.getWeekFileName()) && achievementName.endsWith('nomiss')) // any FC achievements, name should be "weekFileName_nomiss", e.g: "weekd_nomiss";
-				{
-					if(isStoryMode && campaignMisses + songMisses < 1 && CoolUtil.difficultyString() == 'HARD'
-						&& storyPlaylist.length <= 1 && !changedDifficulty && !usedPractice)
-						unlock = true;
-				}
-				switch(achievementName)
-				{
-					case 'ur_bad':
-						if(ratingPercent < 0.2 && !practiceMode) {
-							unlock = true;
-						}
-					case 'ur_good':
-						if(ratingPercent >= 1 && !usedPractice) {
-							unlock = true;
-						}
-					case 'roadkill_enthusiast':
-						if(Achievements.henchmenDeath >= 100) {
-							unlock = true;
-						}
-					case 'oversinging':
-						if(boyfriend.holdTimer >= 10 && !usedPractice) {
-							unlock = true;
-						}
-					case 'hype':
-						if(!boyfriendIdled && !usedPractice) {
-							unlock = true;
-						}
-					case 'two_keys':
-						if(!usedPractice) {
-							var howManyPresses:Int = 0;
-							for (j in 0...keysPressed.length) {
-								if(keysPressed[j]) howManyPresses++;
-							}
-
-							if(howManyPresses <= 2) {
-								unlock = true;
-							}
-						}
-					case 'toastie':
-						if(/*ClientPrefs.framerate <= 60 &&*/ !ClientPrefs.shaders && ClientPrefs.lowQuality && !ClientPrefs.globalAntialiasing) {
-							unlock = true;
-						}
-					case 'debugger':
-						if(Paths.formatToSongPath(SONG.song) == 'test' && !usedPractice) {
-							unlock = true;
-						}
-				}
-
-				if(unlock) {
-					Achievements.unlockAchievement(achievementName);
-					return achievementName;
-				}
-			}
-		}
-		return null;
-	}
-	#end
 
 	var curLight:Int = -1;
 	var curLightEvent:Int = -1;

@@ -1,4 +1,4 @@
-package funkin.options.substates;
+package funkin.options.menu;
 
 #if desktop
 import Discord.DiscordClient;

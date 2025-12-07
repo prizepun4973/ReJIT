@@ -1,9 +1,8 @@
 package ;
 
-#if MODS_ALLOWED
 import sys.io.File;
 import sys.FileSystem;
-#end
+
 import lime.utils.Assets;
 import openfl.utils.Assets as OpenFlAssets;
 import haxe.Json;
@@ -89,7 +88,7 @@ class WeekData {
 	{
 		weeksList = [];
 		weeksLoaded.clear();
-		#if MODS_ALLOWED
+
 		var disabledMods:Array<String> = [];
 		var modsListPath:String = 'modsList.txt';
 		var directories:Array<String> = [Paths.mods(), Paths.getPreloadPath()];
@@ -127,10 +126,6 @@ class WeekData {
 				//trace('pushed Directory: ' + folder);
 			}
 		}
-		#else
-		var directories:Array<String> = [Paths.getPreloadPath()];
-		var originalLength:Int = directories.length;
-		#end
 
 		var sexList:Array<String> = CoolUtil.coolTextFile(Paths.getPreloadPath('weeks/weekList.txt'));
 		for (i in 0...sexList.length) {
@@ -141,11 +136,9 @@ class WeekData {
 					if(week != null) {
 						var weekFile:WeekData = new WeekData(week, sexList[i]);
 
-						#if MODS_ALLOWED
 						if(j >= originalLength) {
 							weekFile.folder = directories[j].substring(Paths.mods().length, directories[j].length-1);
 						}
-						#end
 
 						if(weekFile != null && (isStoryMode == null || (isStoryMode && !weekFile.hideStoryMode) || (!isStoryMode && !weekFile.hideFreeplay))) {
 							weeksLoaded.set(sexList[i], weekFile);
@@ -156,7 +149,6 @@ class WeekData {
 			}
 		}
 
-		#if MODS_ALLOWED
 		for (i in 0...directories.length) {
 			var directory:String = directories[i] + 'weeks/';
 			if(FileSystem.exists(directory)) {
@@ -180,7 +172,6 @@ class WeekData {
 				}
 			}
 		}
-		#end
 	}
 
 	private static function addWeek(weekToCheck:String, path:String, directory:String, i:Int, originalLength:Int)
@@ -193,9 +184,7 @@ class WeekData {
 				var weekFile:WeekData = new WeekData(week, weekToCheck);
 				if(i >= originalLength)
 				{
-					#if MODS_ALLOWED
 					weekFile.folder = directory.substring(Paths.mods().length, directory.length-1);
-					#end
 				}
 				if((PlayState.isStoryMode && !weekFile.hideStoryMode) || (!PlayState.isStoryMode && !weekFile.hideFreeplay))
 				{
@@ -208,15 +197,10 @@ class WeekData {
 
 	private static function getWeekFile(path:String):WeekFile {
 		var rawJson:String = null;
-		#if MODS_ALLOWED
+
 		if(FileSystem.exists(path)) {
 			rawJson = File.getContent(path);
 		}
-		#else
-		if(OpenFlAssets.exists(path)) {
-			rawJson = Assets.getText(path);
-		}
-		#end
 
 		if(rawJson != null && rawJson.length > 0) {
 			return cast Json.parse(rawJson);
@@ -247,7 +231,6 @@ class WeekData {
 	{
 		Paths.currentModDirectory = '';
 		
-		#if MODS_ALLOWED
 		if (FileSystem.exists("modsList.txt"))
 		{
 			var list:Array<String> = CoolUtil.listFromString(File.getContent("modsList.txt"));
@@ -262,6 +245,5 @@ class WeekData {
 				}
 			}
 		}
-		#end
 	}
 }

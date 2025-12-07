@@ -39,9 +39,7 @@ import funkin.menu.TitleState;
 
 import funkin.editors.widget.*;
 
-#if MODS_ALLOWED
 import sys.FileSystem;
-#end
 
 import funkin.component.*;
 import funkin.game.component.*;
@@ -1052,7 +1050,6 @@ class CharacterEditorState extends MusicBeatState
 	function reloadCharacterDropDown() {
 		var charsLoaded:Map<String, Bool> = new Map();
 
-		#if MODS_ALLOWED
 		characterList = [];
 		var directories:Array<String> = [Paths.mods('characters/'), Paths.mods(Paths.currentModDirectory + '/characters/'), Paths.getPreloadPath('characters/')];
 		for(mod in Paths.getGlobalMods())
@@ -1072,9 +1069,6 @@ class CharacterEditorState extends MusicBeatState
 				}
 			}
 		}
-		#else
-		characterList = CoolUtil.coolTextFile(Paths.txt('characterList'));
-		#end
 
 		charDropDown.setData(FlxUIDropDownMenuCustom.makeStrIdLabelArray(characterList, true));
 		charDropDown.selectedLabel = daAnim;

@@ -6,6 +6,7 @@ import Discord.DiscordClient;
 import flash.text.TextField;
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.FlxState;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
@@ -27,36 +28,37 @@ import flixel.graphics.FlxGraphic;
 import funkin.jit.LuaObject;
 import funkin.jit.BuiltinJITState;
 
-import funkin.options.substates.*;
+import funkin.options.menu.*;
 import funkin.component.*;
 
 using StringTools;
 
 class OptionsState extends BuiltinJITState
 {
-	var options:Array<String> = ['Note Colors', 'Controls', 'Adjust Delay and Combo', 'Graphics', 'Visuals and UI', 'Gameplay'];
+	var options:Array<String> = ['Controls', 'Adjust Delay and Combo', 'Graphics', 'Gameplay', 'Mods'];
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 	private static var curSelected:Int = 0;
 	public static var menuBG:FlxSprite;
 
-	public function new() {
+	private var parent:FlxState;
+
+	public function new(parent:FlxState) {
 		super("OptionsState");
+		this.parent = parent;
 	}
 
 	function openSelectedSubstate(label:String) {
 		switch(label) {
-			case 'Note Colors':
-				openSubState(new NotesSubState());
 			case 'Controls':
 				openSubState(new ControlsSubState());
 			case 'Graphics':
 				openSubState(new GraphicsSettingsSubState());
-			case 'Visuals and UI':
-				openSubState(new VisualsUISubState());
 			case 'Gameplay':
 				openSubState(new GameplaySettingsSubState());
 			case 'Adjust Delay and Combo':
-				LoadingState.loadAndSwitchState(new NoteOffsetState());
+				LoadingState.loadAndSwitchState(new NoteOffsetState(parent));
+			case 'Mods':
+				LoadingState.loadAndSwitchState(new ModsMenuState(parent));
 		}
 	}
 
@@ -64,9 +66,6 @@ class OptionsState extends BuiltinJITState
 	var selectorRight:Alphabet;
 
 	override function create() {
-		super.create();
-		if (call("onCreate", [])) return;
-
 		#if desktop
 		DiscordClient.changePresence("Options Menu", null);
 		#end
@@ -98,17 +97,16 @@ class OptionsState extends BuiltinJITState
 		changeSelection();
 		ClientPrefs.saveSettings();
 
-		call("onCreatePost", []);
+		super.create();
 	}
 
 	override function closeSubState() {
 		super.closeSubState();
-		if (!call("onCloseSubState", [])) ClientPrefs.saveSettings();
+		ClientPrefs.saveSettings();
 	}
 
 	override function update(elapsed:Float) {
 		super.update(elapsed);
-		if (call("onUpdate", [elapsed])) return;
 
 		if (controls.UI_UP_P) {
 			changeSelection(-1);
@@ -119,19 +117,12 @@ class OptionsState extends BuiltinJITState
 
 		if (controls.BACK) {
 			FlxG.sound.play(Paths.sound('cancelMenu'));
-			MusicBeatState.switchState(new funkin.menu.MainMenuState());
+			MusicBeatState.switchState(parent);
 		}
 
 		if (controls.ACCEPT) {
 			openSelectedSubstate(options[curSelected]);
 		}
-
-		call("onUpdatePost", []);
-	}
-
-	override function destroy() {
-		call("onDestroy", []);
-		super.destroy();
 	}
 	
 	function changeSelection(change:Int = 0) {

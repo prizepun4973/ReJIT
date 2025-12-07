@@ -1,11 +1,9 @@
 package funkin.editors.jit;
 
-#if LUA_ALLOWED
 import llua.Lua;
 import llua.LuaL;
 import llua.State;
 import llua.Convert;
-#end
 
 import flixel.FlxG;
 import flixel.tweens.FlxTween;
@@ -37,12 +35,10 @@ class EditorLua {
 	public static var Function_Stop = 1;
 	public static var Function_Continue = 0;
 
-	#if LUA_ALLOWED
 	public var lua:State = null;
-	#end
 
 	public function new(script:String) {
-		#if LUA_ALLOWED
+
 		lua = LuaL.newstate();
 		LuaL.openlibs(lua);
 		Lua.init_callbacks(lua);
@@ -183,11 +179,9 @@ class EditorLua {
 		Discord.DiscordClient.addLuaCallbacks(lua);
 
 		call('onCreate', []);
-		#end
 	}
 	
 	public function call(event:String, args:Array<Dynamic>):Dynamic {
-		#if LUA_ALLOWED
 		if(lua == null) {
 			return Function_Continue;
 		}
@@ -214,11 +208,10 @@ class EditorLua {
 			var conv:Dynamic = Convert.fromLua(lua, result);
 			return conv;
 		}
-		#end
+
 		return Function_Continue;
 	}
 
-	#if LUA_ALLOWED
 	function resultIsAllowed(leLua:State, leResult:Null<Int>) { //Makes it ignore warnings
 		switch(Lua.type(leLua, leResult)) {
 			case Lua.LUA_TNIL | Lua.LUA_TBOOLEAN | Lua.LUA_TNUMBER | Lua.LUA_TSTRING | Lua.LUA_TTABLE:
@@ -226,20 +219,16 @@ class EditorLua {
 		}
 		return false;
 	}
-	#end
 
 	public function set(variable:String, data:Dynamic) {
-		#if LUA_ALLOWED
 		if(lua == null) {
 			return;
 		}
 
 		Convert.toLua(lua, data);
 		Lua.setglobal(lua, variable);
-		#end
 	}
 
-	#if LUA_ALLOWED
 	public function getBool(variable:String) {
 		var result:String = null;
 		Lua.getglobal(lua, variable);
@@ -254,16 +243,13 @@ class EditorLua {
 		//trace('variable: ' + variable + ', ' + result);
 		return (result == 'true');
 	}
-	#end
 
 	public function stop() {
-		#if LUA_ALLOWED
 		if(lua == null) {
 			return;
 		}
 
 		Lua.close(lua);
 		lua = null;
-		#end
 	}
 }

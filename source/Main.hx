@@ -12,7 +12,6 @@ import openfl.events.Event;
 import openfl.display.StageScaleMode;
 
 //crash handler stuff
-#if CRASH_HANDLER
 import lime.app.Application;
 import openfl.events.UncaughtErrorEvent;
 import haxe.CallStack;
@@ -21,7 +20,6 @@ import Discord.DiscordClient;
 import sys.FileSystem;
 import sys.io.File;
 import sys.io.Process;
-#end
 
 import funkin.component.*;
 
@@ -95,14 +93,14 @@ class Main extends Sprite
 		FlxG.mouse.visible = false;
 		#end
 		
-		#if CRASH_HANDLER
+		#if desktop
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
 		#end
 	}
 
 	// Code was entirely made by sqirra-rng for their fnf engine named "Izzy Engine", big props to them!!!
 	// very cool person for real they don't get enough credit for their work
-	#if CRASH_HANDLER
+	#if desktop
 	function onCrash(e:UncaughtErrorEvent):Void
 	{
 		var errMsg:String = "";
@@ -114,6 +112,8 @@ class Main extends Sprite
 		dateNow = dateNow.replace(":", "'");
 
 		path = "./crash/" + "PsychEngine_" + dateNow + ".txt";
+		
+		errMsg += e.error + "\n\n";
 
 		for (stackItem in callStack)
 		{
@@ -125,8 +125,6 @@ class Main extends Sprite
 					Sys.println(stackItem);
 			}
 		}
-
-		errMsg += "\nUncaught Error: " + e.error + "\nPlease report this error to the GitHub page: https://github.com/ShadowMario/FNF-PsychEngine\n\n> Crash Handler written by: sqirra-rng";
 
 		if (!FileSystem.exists("./crash/"))
 			FileSystem.createDirectory("./crash/");
