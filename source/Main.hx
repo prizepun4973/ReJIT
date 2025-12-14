@@ -134,7 +134,7 @@ class Main extends Sprite
 		Sys.println(errMsg);
 		Sys.println("Crash dump saved in " + Path.normalize(path));
 
-		Application.current.window.alert(errMsg, "Error!");
+		Application.current.window.alert(errMsg, "Crash Handler");
 		#if hxdiscord_rpc
 		DiscordClient.shutdown();
 		#end
