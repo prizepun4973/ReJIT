@@ -50,7 +50,9 @@ class NoteRemoveAction extends ChartEditorState.EditorAction {
         for (removed in removedNote) {
             var note:GuiNote = new GuiNote(removed.strumTime, removed.noteData, removed.susLength);
             note.noteType = removed.noteType;
-            this.notes.push(note);
+            
+            notes.push(note);
+            trace(note);
 
             ChartEditorState.INSTANCE.renderNotes.add(note);
             // ChartEditorState.INSTANCE.selectIndicator.add(new SelectIndicator(note));

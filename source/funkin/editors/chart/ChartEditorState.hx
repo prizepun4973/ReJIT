@@ -444,8 +444,8 @@ class ChartEditorState extends BuiltinJITState {
             curAction--;
         }
         if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.Y && curAction < timeline.length - 1) {
-            curAction++;
             timeline[curAction].redo();
+            curAction++;
         }
 
         if (curAction >= timeline.length - 1) curAction = timeline.length - 1;
