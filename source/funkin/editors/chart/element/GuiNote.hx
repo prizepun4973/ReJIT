@@ -2,6 +2,7 @@ package funkin.editors.chart.element;
 
 import funkin.editors.chart.ChartEditorState;
 import funkin.editors.chart.ChartEditorState.GuiElement;
+import funkin.editors.chart.action.NoteAddAction;
 import flixel.FlxSprite;
 import flixel.text.FlxText;
 
@@ -13,13 +14,18 @@ class GuiNote extends GuiElement{
     public var susTail:FlxSprite;
     public var typeTxt:FlxText;
 
-    public function new(strumTime:Float, noteData:Int, susLength) {
+    public var relatedAction:NoteAddAction;
+
+    public function new(strumTime:Float, noteData:Int, susLength, relatedAction = null) {
         super(0, 0);
 
         var parent = ChartEditorState.INSTANCE.renderNotes;
         this.strumTime = strumTime;
         this.noteData = noteData;
         this.susLength = susLength;
+
+        this.relatedAction = relatedAction;
+        if (relatedAction != null) relatedAction._note = this;
 
         loadGraphic(Paths.image("NOTE_assets"));
         frames = Paths.getSparrowAtlas("NOTE_assets");

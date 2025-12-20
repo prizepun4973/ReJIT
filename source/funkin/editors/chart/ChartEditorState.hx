@@ -46,8 +46,8 @@ class ChartEditorState extends BuiltinJITState {
     public static var nextUpdateTime:Float;
     
     public var paused:Bool = true;
-    public static var timeline:Array<EditorAction> = new Array();
-    public static var curAction:Int = -1;
+    public static var undos:Array<EditorAction> = new Array();
+    public static var redos:Array<EditorAction> = new Array();
 
     public var beatSnap:Int = 32;
 
@@ -78,8 +78,8 @@ class ChartEditorState extends BuiltinJITState {
         lastUpdateTime = 0;
         nextUpdateTime = 0;
         curSec = 0;
-        timeline = new Array<EditorAction>();
-        curAction = -1;
+        undos = new Array<EditorAction>();
+        redos = new Array<EditorAction>();
     }
     
     public static function getMousePos() {
@@ -439,17 +439,20 @@ class ChartEditorState extends BuiltinJITState {
         }
 
         // undo / redo
-        if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.Z && curAction > -1) {
-            timeline[curAction].undo();
-            curAction--;
+        if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.Z && undos.length > 0) {
+            undos[undos.length - 1].undo();
+            redos.push(undos[undos.length - 1]);
+            undos.pop();
+            trace(undos);
+            trace(redos);
         }
-        if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.Y && curAction < timeline.length - 1) {
-            timeline[curAction].redo();
-            curAction++;
+        if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.Y && redos.length > 0) {
+            redos[redos.length - 1].redo();
+            undos.push(redos[redos.length - 1]);
+            redos.remove(redos[redos.length - 1]);
+            trace(undos);
+            trace(redos);
         }
-
-        if (curAction >= timeline.length - 1) curAction = timeline.length - 1;
-        if (curAction < -1) curAction = -1;
 
         // wip
         if (FlxG.keys.anyJustPressed(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('debug_1')))) {
@@ -458,9 +461,8 @@ class ChartEditorState extends BuiltinJITState {
     }
 
     function addAction(action:EditorAction) {
-        curAction++;
-        trace("hi");
-        timeline.push(action);
+        undos.push(action);
+        if (redos.length > 0) redos = new Array<EditorAction>();
     }
 
     function actionListener() {
@@ -570,6 +572,6 @@ class GuiElement extends FlxSprite {
 
 abstract class EditorAction {
     public function new() {}
-    public function redo() { ChartEditorState.curAction++; }
-    public function undo() { ChartEditorState.curAction--; }
+    public function redo() {}
+    public function undo() {}
 }

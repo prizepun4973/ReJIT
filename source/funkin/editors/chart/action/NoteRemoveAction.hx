@@ -2,6 +2,7 @@ package funkin.editors.chart.action;
 
 import funkin.editors.chart.ChartEditorState;
 import funkin.editors.chart.ChartEditorState.SelectIndicator;
+import funkin.editors.chart.action.NoteAddAction;
 import funkin.editors.chart.element.GuiNote;
 import flixel.FlxG;
 
@@ -10,11 +11,13 @@ typedef NoteRemoveData = {
     var noteData:Int;
     var susLength:Float;
     var noteType:String;
+    var relatedAction:NoteAddAction;
 }
 
 class NoteRemoveAction extends ChartEditorState.EditorAction {
     private var notes:Array<GuiNote> = new Array();
     public var removedNote:Array<NoteRemoveData> = new Array();
+    public var relatedActions:Array<NoteAddAction> = new Array();
 
     public function new(notes:Array<GuiNote>) {
         super();
@@ -24,7 +27,8 @@ class NoteRemoveAction extends ChartEditorState.EditorAction {
                 strumTime: note.strumTime,
                 noteData: note.noteData,
                 susLength: note.susLength,
-                noteType: note.noteType
+                noteType: note.noteType,
+                relatedAction: note.relatedAction
             };
             removedNote.push(data);
 
@@ -36,19 +40,21 @@ class NoteRemoveAction extends ChartEditorState.EditorAction {
 
     override function redo() {
         for (note in notes) {
+            relatedActions.push(note.relatedAction);
+
             ChartEditorState.INSTANCE.selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
                 if (indicator.target == note) ChartEditorState.INSTANCE.selectIndicator.remove(indicator);
             });
 
             ChartEditorState.INSTANCE.renderNotes.remove(note.susTail);
             ChartEditorState.INSTANCE.renderNotes.remove(note);
-            note = null;
+            // note = null;
         }
     }
 
     override function undo() {
         for (removed in removedNote) {
-            var note:GuiNote = new GuiNote(removed.strumTime, removed.noteData, removed.susLength);
+            var note:GuiNote = new GuiNote(removed.strumTime, removed.noteData, removed.susLength, removed.relatedAction);
             note.noteType = removed.noteType;
             
             notes.push(note);
