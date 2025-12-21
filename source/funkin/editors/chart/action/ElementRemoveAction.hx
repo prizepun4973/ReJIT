@@ -20,7 +20,7 @@ typedef ElementRemoveData = {
 }
 
 class ElementRemoveAction extends ChartEditorState.EditorAction {
-    private var elements:Array<GuiElement> = new Array();
+    public var elements:Array<GuiElement> = new Array();
     public var datas:Array<ElementRemoveData> = new Array();
     public var relatedActions:Array<EditorAction> = new Array();
 
@@ -29,7 +29,7 @@ class ElementRemoveAction extends ChartEditorState.EditorAction {
 
         for (element in elements) {
             var selected:Bool = false;
-            ChartEditorState.INSTANCE.selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
+            editor.selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
                 if (indicator.target == element) selected = true;
             });
 
@@ -79,39 +79,42 @@ class ElementRemoveAction extends ChartEditorState.EditorAction {
 
     override function redo() {
         for (element in elements) {
+            element.relatedRemove = this;
             relatedActions.push(element.relatedAction);
 
-            ChartEditorState.INSTANCE.selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
-                if (indicator.target == element) ChartEditorState.INSTANCE.selectIndicator.remove(indicator);
+            editor.selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
+                if (indicator.target == element) editor.selectIndicator.remove(indicator);
             });
 
-            if (Std.isOfType(element, GuiNote)) ChartEditorState.INSTANCE.renderNotes.remove((cast (element, GuiNote)).susTail);
-            ChartEditorState.INSTANCE.renderNotes.remove(element);
+            if (Std.isOfType(element, GuiNote)) editor.renderNotes.remove((cast (element, GuiNote)).susTail);
+            editor.renderNotes.remove(element);
             // note = null;
         }
     }
 
     override function undo() {
         for (data in datas) {
-            trace(data);
+            // trace(datas);
 
             if (data.events == null) {
                 var note:GuiNote = new GuiNote(data.strumTime, data.noteData, data.susLength, data.relatedAction);
                 note.noteType = data.noteType;
+                note.relatedRemove = this;
                 
                 elements.push(note);
-                trace(note);
+                // trace(note);
 
-                if (data.wasSelected) ChartEditorState.INSTANCE.selectIndicator.add(new SelectIndicator(note));
+                if (data.wasSelected) editor.selectIndicator.add(new SelectIndicator(note));
             }
             else {
                 var event:GuiEventNote = new GuiEventNote(data.strumTime, data.events);
+                event.relatedRemove = this;
                 
                 elements.push(event);
-                trace(event);
+                // trace(event);
 
-                ChartEditorState.INSTANCE.renderNotes.add(event);
-                if (data.wasSelected) ChartEditorState.INSTANCE.selectIndicator.add(new SelectIndicator(event));
+                editor.renderNotes.add(event);
+                if (data.wasSelected) editor.selectIndicator.add(new SelectIndicator(event));
             }
         }
     }

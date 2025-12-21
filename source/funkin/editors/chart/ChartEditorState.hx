@@ -113,6 +113,28 @@ class ChartEditorState extends BuiltinJITState {
         return map.songTime + ((strumTime - map.songTime) / crochet * Conductor.crochet);
     }
 
+    public function removeElement(element:GuiElement) {
+        var wasSelected = false;
+        selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
+            if (indicator.target == element) {
+                wasSelected = true;
+                ChartEditorState.INSTANCE.selectIndicator.remove(indicator);
+            }
+        });
+
+        renderNotes.remove(element);
+    }
+
+    public function addElement(element:GuiElement, wasSelected:Bool = false) {
+        renderNotes.add(element);
+        if (wasSelected) selectIndicator.add(new SelectIndicator(element));
+    }
+
+    public function addAction(action:EditorAction) {
+        undos.push(action);
+        if (redos.length > 0) redos = new Array<EditorAction>();
+    }
+
     function pause() {
         if (paused) { // resume
             FlxG.sound.music.time = Conductor.songPosition;
@@ -229,6 +251,7 @@ class ChartEditorState extends BuiltinJITState {
 
         PlayState.SONG = _song;
     }
+    
 
     public function new() {
         super("ChartEditorState");
@@ -453,8 +476,8 @@ class ChartEditorState extends BuiltinJITState {
             undos[undos.length - 1].undo();
             redos.push(undos[undos.length - 1]);
             undos.pop();
-            trace(undos);
-            trace(redos);
+            // trace(undos);
+            // trace(redos);
         }
         if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.Y && redos.length > 0) {
             redos[redos.length - 1].redo();
@@ -469,31 +492,22 @@ class ChartEditorState extends BuiltinJITState {
             funkin.component.MusicBeatState.switchState(new funkin.editors.ChartingState());
         }
     }
-
-    function addAction(action:EditorAction) {
-        undos.push(action);
-        if (redos.length > 0) redos = new Array<EditorAction>();
-    }
+    
 
     function actionListener() {
         if (crosshair.visible) {
-            if (FlxG.mouse.x > gridBG.x + GRID_SIZE) {
-                if (FlxG.mouse.pressed && !FlxG.keys.pressed.CONTROL && !FlxG.keys.pressed.SHIFT && crosshair.target == null && paused) {
+            if (FlxG.mouse.pressed && !FlxG.keys.pressed.CONTROL && !FlxG.keys.pressed.SHIFT && crosshair.target == null && paused) {
+                if (FlxG.mouse.x > gridBG.x + GRID_SIZE) {
                     addAction(new NoteAddAction(
                         crosshair.chained? crosshair.chainedMousePos : getMousePos(), 
                         Math.floor((FlxG.mouse.x - gridBG.x - GRID_SIZE) / GRID_SIZE))
                     );
                 }
-
-                if (FlxG.mouse.pressedRight && !FlxG.keys.pressed.CONTROL && !FlxG.keys.pressed.SHIFT && Std.isOfType(crosshair.target, GuiNote) && paused) {
-                    addAction(new ElementRemoveAction([cast (crosshair.target, GuiNote)]));
-                }
+                else addAction(new EventAddAction(crosshair.chained? crosshair.chainedMousePos : getMousePos()));
             }
-            else {
-                if (FlxG.mouse.pressed && !FlxG.keys.pressed.CONTROL && !FlxG.keys.pressed.SHIFT && crosshair.target == null && paused) {
-                    addAction(new EventAddAction(crosshair.chained? crosshair.chainedMousePos : getMousePos())
-                    );
-                }
+
+            if (FlxG.mouse.pressedRight && !FlxG.keys.pressed.CONTROL && crosshair.target != null && !FlxG.keys.pressed.SHIFT && paused) {
+                addAction(new ElementRemoveAction([crosshair.target]));
             }
         }
     }
@@ -572,6 +586,7 @@ class Crosshair extends FlxSprite {
 class GuiElement extends FlxSprite {
     public var strumTime:Float = 0;
     public var relatedAction:EditorAction;
+    public var relatedRemove:EditorAction;
 
     public function new(X:Float = 0, Y:Float = 0) {
         super(X, Y);
@@ -587,6 +602,7 @@ class GuiElement extends FlxSprite {
 }
 
 abstract class EditorAction {
+    public var editor:ChartEditorState = ChartEditorState.INSTANCE;
     public function new() {}
     public function redo() {}
     public function undo() {}

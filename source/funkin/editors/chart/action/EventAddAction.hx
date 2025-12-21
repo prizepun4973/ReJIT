@@ -19,7 +19,7 @@ class EventAddAction extends ChartEditorState.EditorAction {
         this.strumTime = strumTime;
         this.events = events != null ? events : new Array();
 
-        ChartEditorState.INSTANCE.selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
+        editor.selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
             if (indicator.target == _event) wasSelected = true;
         });
 
@@ -28,19 +28,19 @@ class EventAddAction extends ChartEditorState.EditorAction {
 
     override function redo() {
         _event = new GuiEventNote(strumTime, events, this);
-        if (wasSelected) ChartEditorState.INSTANCE.selectIndicator.add(new SelectIndicator(_event));
-        ChartEditorState.INSTANCE.renderNotes.add(_event);
+        if (wasSelected) editor.selectIndicator.add(new SelectIndicator(_event));
+        editor.renderNotes.add(_event);
     }
 
     override function undo() {
-        ChartEditorState.INSTANCE.selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
+        editor.selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
             if (indicator.target == _event) {
                 wasSelected = true;
-                ChartEditorState.INSTANCE.selectIndicator.remove(indicator);
+                editor.selectIndicator.remove(indicator);
             }
         });
 
         events = _event.events;
-        ChartEditorState.INSTANCE.renderNotes.remove(_event);
+        editor.renderNotes.remove(_event);
     }
 }
