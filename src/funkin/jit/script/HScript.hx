@@ -69,7 +69,7 @@ class HScript extends Script {
 
         setup();
 
-        if (FileSystem.exists(Paths.hscript(path))) execute(Paths.getTextFromFile(Paths.hscript(path)));
+        if (FileSystem.exists(Paths.hscript(path))) execute(sys.io.File.getContent(Paths.hscript(path)));
 	}
 
     function addClass(libName:String, libPackage:String) {
@@ -88,6 +88,18 @@ class HScript extends Script {
     function convertedParent():Dynamic {
         return Std.isOfType(target, ILuaState) ? (cast (target, ILuaState)) : (cast (target, PlayState));
     }
+
+	// https://github.com/CodenameCrew/CodenameEngine
+	override function call(funcName:String, args:Array<Dynamic>) {
+		if (interp == null) return null;
+		if (!interp.variables.exists(funcName)) return null;
+
+		var func = interp.variables.get(funcName);
+		if (func != null && Reflect.isFunction(func))
+			return Reflect.callMethod(null, func, args);
+
+		return null;
+	}
 
 	public function trace(v:Dynamic) {
         if (path == "") trace(Std.string(v));

@@ -1,6 +1,6 @@
 package funkin.jit;
 
-import funkin.jit.script.LuaScript;
+import funkin.jit.script.Script;
 import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.tweens.FlxTween;
@@ -8,7 +8,7 @@ import flixel.util.FlxTimer;
 import flixel.sound.FlxSound;
 
 interface ILuaState {
-    public var stateLua:LuaScript;
+    public var script:Script;
     public var _cancel:Bool;
 
     public var sprites:Map<String, FlxSprite>;

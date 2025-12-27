@@ -5,13 +5,13 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxTimer;
 import flixel.sound.FlxSound;
 import flixel.text.FlxText;
-import funkin.jit.script.LuaScript;
+import funkin.jit.script.*;
 
 import funkin.component.*;
 
 class BuiltinJITSubState extends MusicBeatSubstate implements ILuaState {
 
-    public var stateLua:LuaScript;
+    public var script:Script;
     public var _cancel:Bool;
 
     public var sprites:Map<String, FlxSprite> = new Map();
@@ -24,7 +24,7 @@ class BuiltinJITSubState extends MusicBeatSubstate implements ILuaState {
     public function new(path:String) {
         super();
         _cancel = false;
-        stateLua = new LuaScript("scripts/states/substate/"+ path, this, function (lua:LuaScript) { BuiltinJITState.registerCallback(lua); });
+        script = new LuaScript("scripts/states/substate/"+ path, this, function (lua:LuaScript) { BuiltinJITState.registerCallback(lua); });
     }
 
     override function destroy() {
@@ -48,7 +48,7 @@ class BuiltinJITSubState extends MusicBeatSubstate implements ILuaState {
     }
 
     function call(name:String, args:Array<Dynamic>):Bool {
-        if (stateLua != null) stateLua.call(name, args);
+        if (script != null) script.call(name, args);
 
         var result:Bool = false;
         if (_cancel == true) {

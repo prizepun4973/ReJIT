@@ -13,7 +13,7 @@ import flixel.util.FlxColor;
 import flixel.FlxState;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import Type.ValueType;
-import funkin.jit.script.LuaScript;
+import funkin.jit.script.*;
 import animateatlas.AtlasFrameMaker;
 import flixel.FlxSubState;
 
@@ -21,7 +21,7 @@ import funkin.component.*;
 
 class BuiltinJITState extends MusicBeatState implements ILuaState {
 
-    public var stateLua:LuaScript;
+    public var script:Script;
     public var _cancel:Bool;
 
     public var sprites:Map<String, FlxSprite> = new Map();
@@ -34,7 +34,8 @@ class BuiltinJITState extends MusicBeatState implements ILuaState {
     public function new(path:String) {
         super();
         _cancel = false;
-        stateLua = new LuaScript("scripts/states/"+ path, this, function (lua:LuaScript) { registerCallback(lua); });
+        script = new LuaScript("scripts/states/" + path, this, function (lua:LuaScript) { registerCallback(lua); });
+		if ((cast (script, LuaScript)).lua == null) script = new HScript("scripts/states/" + path, this);
     }
 
     override function destroy() {
@@ -58,7 +59,7 @@ class BuiltinJITState extends MusicBeatState implements ILuaState {
     }
 
     function call(name:String, args:Array<Dynamic>):Bool {
-        if (stateLua != null) stateLua.call(name, args);
+        if (script != null) script.call(name, args);
 
         var result:Bool = false;
         if (_cancel == true) {
