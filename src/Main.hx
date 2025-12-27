@@ -37,37 +37,24 @@ class Main extends Sprite
 
 	// You can pretty much ignore everything from here on - your code should go in your states.
 
-	public static function main():Void
-	{
+	public static function main():Void {
 		Lib.current.addChild(new Main());
 	}
 
-	public function new()
-	{
+	public function new() {
 		super();
 
-		if (stage != null)
-		{
-			init();
-		}
-		else
-		{
-			addEventListener(Event.ADDED_TO_STAGE, init);
-		}
+		if (stage != null) init();
+		else addEventListener(Event.ADDED_TO_STAGE, init);
 	}
 
-	private function init(?E:Event):Void
-	{
-		if (hasEventListener(Event.ADDED_TO_STAGE))
-		{
-			removeEventListener(Event.ADDED_TO_STAGE, init);
-		}
+	private function init(?E:Event):Void {
+		if (hasEventListener(Event.ADDED_TO_STAGE)) removeEventListener(Event.ADDED_TO_STAGE, init);
 
 		setupGame();
 	}
 
-	private function setupGame():Void
-	{
+	private function setupGame():Void {
 		var stageWidth:Int = Lib.current.stage.stageWidth;
 		var stageHeight:Int = Lib.current.stage.stageHeight;
 
@@ -101,8 +88,7 @@ class Main extends Sprite
 	// Code was entirely made by sqirra-rng for their fnf engine named "Izzy Engine", big props to them!!!
 	// very cool person for real they don't get enough credit for their work
 	#if desktop
-	function onCrash(e:UncaughtErrorEvent):Void
-	{
+	function onCrash(e:UncaughtErrorEvent):Void {
 		var errMsg:String = "";
 		var path:String;
 		var callStack:Array<StackItem> = CallStack.exceptionStack(true);
@@ -111,7 +97,7 @@ class Main extends Sprite
 		dateNow = dateNow.replace(" ", "_");
 		dateNow = dateNow.replace(":", "'");
 
-		path = "./crash/" + "PsychEngine_" + dateNow + ".txt";
+		path = "./crash/" + "Crash_" + dateNow + ".txt";
 		
 		errMsg += e.error + "\n\n";
 
