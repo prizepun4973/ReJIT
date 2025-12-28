@@ -19,13 +19,13 @@ import sys.io.File;
 
 import lime.utils.Assets;
 
-import funkin.jit.BuiltinJITState;
+import funkin.jit.InjectedState;
 
 import funkin.component.*;
 
 using StringTools;
 
-class CreditsState extends BuiltinJITState
+class CreditsState extends InjectedState
 {
 	var curSelected:Int = -1;
 

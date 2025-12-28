@@ -16,13 +16,13 @@ import lime.utils.AssetManifest;
 
 import haxe.io.Path;
 
-import funkin.jit.BuiltinJITState;
+import funkin.jit.InjectedState;
 
 import funkin.component.*;
 import funkin.game.data.StageData;
 
 
-class LoadingState extends BuiltinJITState
+class LoadingState extends InjectedState
 {
 	inline static var MIN_TIME = 1.0;
 

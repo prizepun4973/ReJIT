@@ -25,14 +25,14 @@ import flixel.util.FlxTimer;
 import flixel.input.keyboard.FlxKey;
 import flixel.graphics.FlxGraphic;
 
-import funkin.jit.BuiltinJITState;
+import funkin.jit.InjectedState;
 
 import funkin.options.menu.*;
 import funkin.component.*;
 
 using StringTools;
 
-class OptionsState extends BuiltinJITState
+class OptionsState extends InjectedState
 {
 	var options:Array<String> = ['Controls', 'Graphics', 'Gameplay', 'Mods'];
 	private var grpOptions:FlxTypedGroup<Alphabet>;

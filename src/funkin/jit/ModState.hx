@@ -6,7 +6,7 @@ import flixel.util.FlxTimer;
 import flixel.sound.FlxSound;
 import flixel.text.FlxText;
 
-class ModState extends BuiltinJITState implements IModState {
+class ModState extends InjectedState implements IModState {
 
     public function new(path:String) {
         super(path);

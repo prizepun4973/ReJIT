@@ -1,7 +1,8 @@
 package funkin.jit.script;
 
 import sys.FileSystem;
-import funkin.jit.BuiltinJITState;
+import sys.io.File;
+import funkin.jit.InjectedState;
 import hscript.Parser;
 import hscript.Interp;
 import hscript.Expr;
@@ -64,7 +65,6 @@ class HScript extends Script {
 
 	public static var parser:Parser = new Parser();
 	public var interp:Interp;
-	public var expr:Expr;
     public var code:String = "";
 
     public var path:String;
@@ -85,7 +85,7 @@ class HScript extends Script {
 
         setup();
 
-        if (FileSystem.exists(Paths.hscript(path))) execute(sys.io.File.getContent(Paths.hscript(path)));
+        if (FileSystem.exists(Paths.hscript(path))) execute(File.getContent(Paths.hscript(path)));
 	}
 
     function addClass(libName:String, libPackage:String) {
@@ -98,12 +98,6 @@ class HScript extends Script {
 		HScript.parser.allowTypes = true;
 
         code = codeToRun;
-
-		try {
-			if (code != null && StringTools.trim(code) != "") expr = parser.parseString(code, path);
-		} catch(e:Dynamic) {
-			Sys.println(e);
-		}
 
 		try {
 			return interp.execute(HScript.parser.parseString(codeToRun));
@@ -140,5 +134,11 @@ class HScript extends Script {
 	public function trace(v:Dynamic) {
         if (path == "") Sys.println(Std.string(v));
 		else Sys.println(path + '.hx: ' + Std.string(v));
+	}
+
+	static function loadMappings() {
+		if (!FileSystem.exists("mappings.json")) return;
+
+		var result:Map<String, String> = cast haxe.Json.parse(File.getContent("mappings"));
 	}
 }

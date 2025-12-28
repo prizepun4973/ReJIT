@@ -11,12 +11,12 @@ import flixel.addons.transition.FlxTransitionableState;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxTimer;
 
-import funkin.jit.BuiltinJITState;
+import funkin.jit.InjectedState;
 
 import funkin.menu.TitleState;
 import funkin.component.*;
 
-class FlashingState extends BuiltinJITState
+class FlashingState extends InjectedState
 {
 	public static var leftState:Bool = false;
 

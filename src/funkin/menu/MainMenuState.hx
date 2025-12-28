@@ -20,13 +20,13 @@ import lime.app.Application;
 
 import flixel.input.keyboard.FlxKey;
 
-import funkin.jit.BuiltinJITState;
+import funkin.jit.InjectedState;
 
 import funkin.component.*;
 
 using StringTools;
 
-class MainMenuState extends BuiltinJITState
+class MainMenuState extends InjectedState
 {
 	public static var psychEngineVersion:String = '0.6.3'; //This is also used for Discord RPC
 	public static var curSelected:Int = 0;

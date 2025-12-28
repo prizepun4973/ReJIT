@@ -19,7 +19,7 @@ import flixel.FlxSubState;
 
 import funkin.component.*;
 
-class BuiltinJITState extends MusicBeatState implements IModState {
+class InjectedState extends MusicBeatState implements IModState {
 
     public var script:Script;
     public var _cancel:Bool;
@@ -187,8 +187,8 @@ class BuiltinJITState extends MusicBeatState implements IModState {
 			}
 		});
 		Lua_helper.add_callback(lua, "closeSubState", function(){
-			if (Std.isOfType(target, BuiltinJITState)) (cast (target, BuiltinJITState)).closeSubState();
-			else (cast (target, BuiltinJITSubState)).close();
+			if (Std.isOfType(target, InjectedState)) (cast (target, InjectedState)).closeSubState();
+			else (cast (target, InjectedSubState)).close();
 		});
 		Lua_helper.add_callback(lua, "switchState", function (state:String){MusicBeatState.switchState(CoolUtil.getStateByString(state));});
 		Lua_helper.add_callback(lua, "instantSwitchState", function (state:String){FlxG.switchState(CoolUtil.getStateByString(state));});
@@ -639,7 +639,7 @@ class BuiltinJITState extends MusicBeatState implements IModState {
 	}
 
 	static function convertedParent(parent:IModState):FlxState {
-		return Std.isOfType(parent, BuiltinJITState) ? (cast (parent, BuiltinJITState)) : (cast (parent, FlxState));
+		return Std.isOfType(parent, InjectedState) ? (cast (parent, InjectedState)) : (cast (parent, FlxState));
 	}
 
     /*

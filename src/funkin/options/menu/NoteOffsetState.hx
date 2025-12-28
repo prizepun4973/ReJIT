@@ -1,6 +1,6 @@
 package funkin.options.menu;
 
-import funkin.jit.BuiltinJITState;
+import funkin.jit.InjectedState;
 import flixel.util.FlxStringUtil;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
@@ -24,7 +24,7 @@ import funkin.options.OptionsState;
 
 using StringTools;
 
-class NoteOffsetState extends BuiltinJITState
+class NoteOffsetState extends InjectedState
 {
 	var boyfriend:Character;
 	var gf:Character;

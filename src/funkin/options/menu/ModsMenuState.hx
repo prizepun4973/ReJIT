@@ -32,14 +32,14 @@ import haxe.zip.Entry;
 import haxe.zip.Uncompress;
 import haxe.zip.Writer;*/
 
-import funkin.jit.BuiltinJITState;
+import funkin.jit.InjectedState;
 
 import funkin.component.*;
 import funkin.menu.*;
 
 using StringTools;
 
-class ModsMenuState extends BuiltinJITState
+class ModsMenuState extends InjectedState
 {
 	var mods:Array<ModMetadata> = [];
 	static var changedAThing = false;

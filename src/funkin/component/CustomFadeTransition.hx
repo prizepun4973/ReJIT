@@ -1,6 +1,6 @@
 package funkin.component;
 
-import funkin.jit.BuiltinJITSubState;
+import funkin.jit.InjectedSubState;
 import Conductor.BPMChangeEvent;
 import flixel.FlxG;
 import flixel.addons.ui.FlxUIState;
@@ -15,7 +15,7 @@ import flixel.FlxSubState;
 import flixel.FlxSprite;
 import flixel.FlxCamera;
 
-class CustomFadeTransition extends BuiltinJITSubState {
+class CustomFadeTransition extends InjectedSubState {
 	public static var finishCallback:Void->Void;
 	private var leTween:FlxTween = null;
 	public static var nextCamera:FlxCamera;

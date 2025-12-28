@@ -9,7 +9,7 @@ import funkin.jit.script.*;
 
 import funkin.component.*;
 
-class BuiltinJITSubState extends MusicBeatSubstate implements IModState {
+class InjectedSubState extends MusicBeatSubstate implements IModState {
 
     public var script:Script;
     public var _cancel:Bool;
@@ -24,7 +24,7 @@ class BuiltinJITSubState extends MusicBeatSubstate implements IModState {
     public function new(path:String) {
         super();
         _cancel = false;
-        script = new LuaScript("scripts/state/substate/"+ path, this, function (lua:LuaScript) { BuiltinJITState.registerCallback(lua); });
+        script = new LuaScript("scripts/state/substate/"+ path, this, function (lua:LuaScript) { InjectedState.registerCallback(lua); });
     }
 
     override function destroy() {

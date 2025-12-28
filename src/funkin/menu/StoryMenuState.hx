@@ -18,7 +18,7 @@ import flixel.util.FlxTimer;
 import lime.net.curl.CURLCode;
 import flixel.graphics.FlxGraphic;
 
-import funkin.jit.BuiltinJITState;
+import funkin.jit.InjectedState;
 
 import funkin.component.*;
 
@@ -26,7 +26,7 @@ import funkin.component.*;
 
 using StringTools;
 
-class StoryMenuState extends BuiltinJITState
+class StoryMenuState extends InjectedState
 {
 	public static var weekCompleted:Map<String, Bool> = new Map<String, Bool>();
 

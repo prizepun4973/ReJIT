@@ -1,6 +1,6 @@
 package funkin.menu;
 
-import funkin.jit.BuiltinJITSubState;
+import funkin.jit.InjectedSubState;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -29,7 +29,7 @@ import funkin.component.*;
 
 using StringTools;
 
-class GameplayChangersSubstate extends BuiltinJITSubState
+class GameplayChangersSubstate extends InjectedSubState
 {
 	private var curOption:GameplayOption = null;
 	private var curSelected:Int = 0;

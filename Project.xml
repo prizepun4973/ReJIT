@@ -94,6 +94,8 @@
 	<assets path="assets/week7"         library="week7"         exclude="*.mp3" unless="web"/>
 	
 	<assets path='example_mods' rename='mods' embed='false'/>
+
+	<assets path='mappings.json' embed='false'/>
 	
 	<!-- <assets path='art/readme.txt' rename='do NOT readme.txt' /> -->
 	<!-- <template path='mods' /> -->

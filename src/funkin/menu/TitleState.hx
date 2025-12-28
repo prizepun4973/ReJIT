@@ -36,7 +36,7 @@ import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import openfl.Assets;
 
-import funkin.jit.BuiltinJITState;
+import funkin.jit.InjectedState;
 
 import funkin.component.*;
 import funkin.game.component.shader.ColorSwap;
@@ -54,7 +54,7 @@ typedef TitleData =
 	backgroundSprite:String,
 	bpm:Int
 }
-class TitleState extends BuiltinJITState
+class TitleState extends InjectedState
 {
 	public static var muteKeys:Array<FlxKey> = [FlxKey.ZERO];
 	public static var volumeDownKeys:Array<FlxKey> = [FlxKey.NUMPADMINUS, FlxKey.MINUS];

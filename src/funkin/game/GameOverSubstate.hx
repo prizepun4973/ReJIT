@@ -1,6 +1,6 @@
 package funkin.game;
 
-import funkin.jit.BuiltinJITSubState;
+import funkin.jit.InjectedSubState;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSubState;
@@ -15,7 +15,7 @@ import funkin.menu.*;
 import funkin.component.*;
 import funkin.game.component.*;
 
-class GameOverSubstate extends BuiltinJITSubState
+class GameOverSubstate extends InjectedSubState
 {
 	public var boyfriend:Boyfriend;
 	var camFollow:FlxPoint;

@@ -1,7 +1,7 @@
 package funkin.editors.chart;
 
 import flixel.text.FlxText;
-import funkin.jit.BuiltinJITState;
+import funkin.jit.InjectedState;
 import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.text.FlxText.FlxTextAlign;
@@ -35,7 +35,7 @@ import funkin.editors.chart.action.*;
 
 using StringTools;
 
-class ChartEditorState extends BuiltinJITState {
+class ChartEditorState extends InjectedState {
     public static var GRID_SIZE:Int = 40;
     public static var Y_OFFSET:Int = 360;
     public static var INSTANCE:ChartEditorState;

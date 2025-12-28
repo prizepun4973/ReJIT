@@ -19,7 +19,7 @@ import openfl.utils.Assets as OpenFlAssets;
 
 import sys.FileSystem;
 
-import funkin.jit.BuiltinJITState;
+import funkin.jit.InjectedState;
 
 import funkin.component.*;
 import funkin.game.component.HealthIcon;
@@ -28,7 +28,7 @@ import funkin.game.component.HealthIcon;
 
 using StringTools;
 
-class FreeplayState extends BuiltinJITState
+class FreeplayState extends InjectedState
 {
 	var songs:Array<SongMetadata> = [];
 

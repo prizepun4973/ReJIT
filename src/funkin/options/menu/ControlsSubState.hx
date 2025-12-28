@@ -1,6 +1,6 @@
 package funkin.options.menu;
 
-import funkin.jit.BuiltinJITSubState;
+import funkin.jit.InjectedSubState;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -29,7 +29,7 @@ import funkin.component.*;
 
 using StringTools;
 
-class ControlsSubState extends BuiltinJITSubState {
+class ControlsSubState extends InjectedSubState {
 	private static var curSelected:Int = 1;
 	private static var curAlt:Bool = false;
 

@@ -1,6 +1,6 @@
 package funkin.game;
 
-import funkin.jit.BuiltinJITSubState;
+import funkin.jit.InjectedSubState;
 import funkin.options.Controls.Control;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -20,7 +20,7 @@ import flixel.util.FlxStringUtil;
 import funkin.component.*;
 import funkin.menu.*;
 
-class PauseSubState extends BuiltinJITSubState
+class PauseSubState extends InjectedSubState
 {
 	var grpMenuShit:FlxTypedGroup<Alphabet>;
 
