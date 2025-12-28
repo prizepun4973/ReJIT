@@ -8,31 +8,46 @@ import hscript.Expr;
 
 import flixel.FlxState;
 import funkin.game.component.Character;
+import funkin.jit.script.Script;
 
 class HScript extends Script {
 
     function setup() {
+		// flixel
         addClass('FlxG', 'flixel');
-		interp.variables.set('FlxSprite', flixel.FlxSprite);
-		interp.variables.set('FlxCamera', flixel.FlxCamera);
-		interp.variables.set('FlxTimer', flixel.util.FlxTimer);
-		interp.variables.set('FlxTween', flixel.tweens.FlxTween);
-		interp.variables.set('FlxEase', flixel.tweens.FlxEase);
-		interp.variables.set('PlayState', PlayState);
-		interp.variables.set('game', PlayState.instance);
-		interp.variables.set('Paths', Paths);
-		interp.variables.set('Conductor', Conductor);
-		interp.variables.set('ClientPrefs', ClientPrefs);
-		interp.variables.set('Character', funkin.game.component.Character);
-		interp.variables.set('Alphabet', funkin.component.Alphabet);
-		interp.variables.set('CustomSubstate', funkin.game.jit.FunkinLua.CustomSubstate);
-        #if (!flash && sys)interp.variables.set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);#end
-		interp.variables.set('ShaderFilter', openfl.filters.ShaderFilter);
-		interp.variables.set('StringTools', StringTools);
+		addClass('FlxSprite', 'flixel');
+		addClass('FlxCamera', 'flixel');
+		addClass('FlxTimer', 'flixel.util');
+		addClass('FlxTween', 'flixel.tweens');
+		addClass('FlxEase', 'flixel.tweens');
+		#if (!flash && sys) addClass('FlxRuntimeShader', 'flixel.addons.display'); #end
+		addClass('ShaderFilter', 'openfl.filters');
+		
+		// haxe
+		addClass('StringTools', '');
 
+		// funkin
+		
+		addClass('PlayState', '');
+		addClass('Paths', '');
+		addClass('Conductor', '');
+		addClass('ClientPrefs', '');
+		addClass('Character', 'funkin.game.component');
+		addClass('Alphabet', 'funkin.component');
+		
+		addClass('ModState', 'funkin.jit');
+		addClass('ModSubState', 'funkin.jit');
+
+		interp.variables.set('Function_Stop', Script.Function_Stop);
+		interp.variables.set('Function_Continue', Script.Function_Continue);
+		interp.variables.set('Function_StopLua', Script.Function_StopLua);
+		
         /**
 		 * lua jit
 		 */
+		interp.variables.set('game', 'PlayState.instance');
+		interp.variables.set('CustomSubstate', funkin.game.jit.FunkinLua.CustomSubstate);
+
 		interp.variables.set('setVar', function(name:String, value:Dynamic) { convertedParent().variables.set(name, value); });
 		interp.variables.set('getVar', function(name:String){ 
 			if (convertedParent().variables.exists(name)) return convertedParent().variables.get(name);
@@ -49,6 +64,7 @@ class HScript extends Script {
 
 	public static var parser:Parser = new Parser();
 	public var interp:Interp;
+	public var expr:Expr;
     public var code:String = "";
 
     public var path:String;
@@ -73,7 +89,7 @@ class HScript extends Script {
 	}
 
     function addClass(libName:String, libPackage:String) {
-        interp.variables.set(libName, Type.resolveClass(libPackage + "." + libName));
+        interp.variables.set(libName, Type.resolveClass(libPackage != "" ? libPackage + "." + libName : libName));
     }
 
 	public function execute(codeToRun:String):Dynamic {
@@ -82,7 +98,20 @@ class HScript extends Script {
 		HScript.parser.allowTypes = true;
 
         code = codeToRun;
-		return interp.execute(HScript.parser.parseString(codeToRun));
+
+		try {
+			if (code != null && StringTools.trim(code) != "") expr = parser.parseString(code, path);
+		} catch(e:Dynamic) {
+			Sys.println(e);
+		}
+
+		try {
+			return interp.execute(HScript.parser.parseString(codeToRun));
+		}
+		catch (e:Dynamic) {
+			Sys.println(e);
+			return null;
+		}
 	}
 
     function convertedParent():Dynamic {
@@ -95,14 +124,21 @@ class HScript extends Script {
 		if (!interp.variables.exists(funcName)) return null;
 
 		var func = interp.variables.get(funcName);
-		if (func != null && Reflect.isFunction(func))
-			return Reflect.callMethod(null, func, args);
-
+		if (func != null && Reflect.isFunction(func)) {
+			try {
+				return Reflect.callMethod(null, func, args);
+			}
+			catch (e:Dynamic) {
+				Sys.println(e);
+				return null;
+			}
+		}
+		
 		return null;
 	}
 
 	public function trace(v:Dynamic) {
-        if (path == "") trace(Std.string(v));
-		else trace(path + '.hx: ' + Std.string(v));
+        if (path == "") Sys.println(Std.string(v));
+		else Sys.println(path + '.hx: ' + Std.string(v));
 	}
 }

@@ -25,8 +25,7 @@ import funkin.component.*;
 
 using StringTools;
 
-class Main extends Sprite
-{
+class Main extends Sprite {
 	var gameWidth:Int = 1280; // Width of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var gameHeight:Int = 720; // Height of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var initialState:Class<FlxState> = funkin.menu.TitleState; // The FlxState the game starts with.
@@ -50,7 +49,6 @@ class Main extends Sprite
 
 	private function init(?E:Event):Void {
 		if (hasEventListener(Event.ADDED_TO_STAGE)) removeEventListener(Event.ADDED_TO_STAGE, init);
-
 		setupGame();
 	}
 
@@ -58,9 +56,7 @@ class Main extends Sprite
 		var stageWidth:Int = Lib.current.stage.stageWidth;
 		var stageHeight:Int = Lib.current.stage.stageHeight;
 
-		#if hxdiscord_rpc
-		DiscordClient.prepare();
-		#end
+		#if hxdiscord_rpc DiscordClient.prepare(); #end
 
 		ClientPrefs.loadDefaultKeys();
 		addChild(new FlxGame(gameWidth, gameHeight, initialState, framerate, framerate, skipSplash, startFullscreen));
@@ -70,9 +66,7 @@ class Main extends Sprite
 		addChild(fpsVar);
 		Lib.current.stage.align = "tl";
 		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
-		if(fpsVar != null) {
-			fpsVar.visible = ClientPrefs.showFPS;
-		}
+		if(fpsVar != null) fpsVar.visible = ClientPrefs.showFPS;
 		#end
 
 		#if html5
@@ -80,15 +74,15 @@ class Main extends Sprite
 		FlxG.mouse.visible = false;
 		#end
 		
-		#if desktop
-		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
-		#end
+		#if desktop Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash); #end
 	}
 
 	// Code was entirely made by sqirra-rng for their fnf engine named "Izzy Engine", big props to them!!!
 	// very cool person for real they don't get enough credit for their work
 	#if desktop
 	function onCrash(e:UncaughtErrorEvent):Void {
+		Sys.println("\n----------------------------------------------------");
+
 		var errMsg:String = "";
 		var path:String;
 		var callStack:Array<StackItem> = CallStack.exceptionStack(true);
@@ -101,10 +95,8 @@ class Main extends Sprite
 		
 		errMsg += e.error + "\n\n";
 
-		for (stackItem in callStack)
-		{
-			switch (stackItem)
-			{
+		for (stackItem in callStack) {
+			switch (stackItem) {
 				case FilePos(s, file, line, column):
 					errMsg += file + " (line " + line + ")\n";
 				default:
@@ -112,18 +104,16 @@ class Main extends Sprite
 			}
 		}
 
-		if (!FileSystem.exists("./crash/"))
-			FileSystem.createDirectory("./crash/");
+		if (!FileSystem.exists("./crash/")) FileSystem.createDirectory("./crash/");
 
 		File.saveContent(path, errMsg + "\n");
 
 		Sys.println(errMsg);
-		Sys.println("Crash dump saved in " + Path.normalize(path));
-
+		Sys.println("Crash dump: " + Path.normalize(path));
+		Sys.println("\n----------------------------------------------------");
 		Application.current.window.alert(errMsg, "Crash Handler");
-		#if hxdiscord_rpc
-		DiscordClient.shutdown();
-		#end
+		#if hxdiscord_rpc DiscordClient.shutdown(); #end
+
 		Sys.exit(1);
 	}
 	#end

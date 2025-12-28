@@ -14,16 +14,26 @@ class ModState extends BuiltinJITState implements IModState {
 
     override function create() {
         super.create();
-        call("onCreatePost", []);
+        call("create", []);
     }
 
     override function update(elapsed:Float) {
         super.update(elapsed);
-        call("onUpdatePost", [elapsed]);
+        call("update", [elapsed]);
     }
 
     override function destroy() {
-        call("onDestroy", []);
+        call("destroy", []);
         super.destroy();
+    }
+
+    override function onFocus() {
+        super.onFocus();
+        call("onFocus", []);
+    }
+
+    override function onFocusLost() {
+        super.onFocusLost();
+        call("onFocusLost", []);
     }
 }

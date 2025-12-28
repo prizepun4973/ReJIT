@@ -24,7 +24,7 @@ class BuiltinJITSubState extends MusicBeatSubstate implements IModState {
     public function new(path:String) {
         super();
         _cancel = false;
-        script = new LuaScript("scripts/states/substate/"+ path, this, function (lua:LuaScript) { BuiltinJITState.registerCallback(lua); });
+        script = new LuaScript("scripts/state/substate/"+ path, this, function (lua:LuaScript) { BuiltinJITState.registerCallback(lua); });
     }
 
     override function destroy() {
@@ -48,14 +48,8 @@ class BuiltinJITSubState extends MusicBeatSubstate implements IModState {
     }
 
     function call(name:String, args:Array<Dynamic>):Bool {
-        if (script != null) script.call(name, args);
-
-        var result:Bool = false;
-        if (_cancel == true) {
-            result = true;
-            _cancel = false;
-        }
-        return result;
+        if (script != null) return script.call(name, args) == Script.Function_Stop;
+        return false;
     }
 
     public function getLuaObject(tag:String, text:Bool=true):FlxSprite {

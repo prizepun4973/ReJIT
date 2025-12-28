@@ -34,7 +34,7 @@ class BuiltinJITState extends MusicBeatState implements IModState {
     public function new(path:String) {
         super();
         _cancel = false;
-        script = new LuaScript("scripts/states/" + path, this, function (lua:LuaScript) { registerCallback(lua); });
+        script = new LuaScript("scripts/state/" + path, this, function (lua:LuaScript) { registerCallback(lua); });
 		if ((cast (script, LuaScript)).lua == null) script = new HScript("scripts/states/" + path, this);
     }
 
@@ -59,14 +59,8 @@ class BuiltinJITState extends MusicBeatState implements IModState {
     }
 
     function call(name:String, args:Array<Dynamic>):Bool {
-        if (script != null) script.call(name, args);
-
-        var result:Bool = false;
-        if (_cancel == true) {
-            result = true;
-            _cancel = false;
-        }
-        return result;
+        if (script != null) return script.call(name, args) == Script.Function_Stop;
+        return false;
     }
 
     public function getLuaObject(tag:String, text:Bool=true):FlxSprite {

@@ -7,14 +7,11 @@ import llua.Lua;
 import llua.LuaL;
 import llua.State;
 import StringTools;
+import funkin.jit.script.Script;
 
 import flixel.util.FlxColor;
 
 class LuaScript extends Script {
-    public static var Function_Stop:Dynamic = "##PSYCHLUA_FUNCTIONSTOP";
-	public static var Function_Continue:Dynamic = "##PSYCHLUA_FUNCTIONCONTINUE";
-	public static var Function_StopLua:Dynamic = "##PSYCHLUA_FUNCTIONSTOPLUA";
-
     public var lua:State = LuaL.newstate();
     public var scriptName:String = '';
 
@@ -91,7 +88,7 @@ class LuaScript extends Script {
 
 	var lastCalledFunction:String = '';
     override function call(event:String, args:Array<Dynamic>):Dynamic {
-		if (lua == null) return Function_Continue;
+		if (lua == null) return Script.Function_Continue;
 
 		lastCalledFunction = event;
 
@@ -123,11 +120,11 @@ class LuaScript extends Script {
 			if (Lua.type(lua, -1) == Lua.LUA_TSTRING) {
 				var error:String = Lua.tostring(lua, -1);
 				Lua.pop(lua, 1);
-				if (error == 'attempt to call a nil value') return Function_Continue; // Makes it ignore warnings and not break stuff if you didn't put the functions on your lua file
+				if (error == 'attempt to call a nil value') return Script.Function_Continue; // Makes it ignore warnings and not break stuff if you didn't put the functions on your lua file
 			} return Convert.fromLua(lua, result);
 		}
 
-		return Function_Continue;
+		return Script.Function_Continue;
 	}
 
     override function stop() {
