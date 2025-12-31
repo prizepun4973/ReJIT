@@ -24,22 +24,22 @@ class LuaScript extends Script {
         LuaL.openlibs(lua);
 		Lua.init_callbacks(lua);
 
-        if (!FileSystem.exists(Paths.lua(script))) {
+        if (!FileSystem.exists(script)) {
 			lua = null;
 			return;
 		}
 
-        var result:Dynamic = LuaL.dofile(lua, Paths.lua(script));
+        var result:Dynamic = LuaL.dofile(lua, script);
 		var resultStr:String = Lua.tostring(lua, result);
 
 		if (resultStr != null && result != 0) {
-			trace("Failed to load " + script + ".lua: " + resultStr);
+			trace("Failed to load " + script + ": " + resultStr);
 			lua = null;
 			return;
 		}
 
         scriptName = script;
-        trace('Loaded lua: ' + script + '.lua');
+        trace('Loaded lua: ' + script);
 
 		initHaxeModule();
 
@@ -55,25 +55,17 @@ class LuaScript extends Script {
 			var retVal:Dynamic = null;
 
 			initHaxeModule();
-			try {
-				retVal = hscript.execute(codeToRun);
-			}
-			catch (e:Dynamic) {
-				trace(scriptName + ":" + lastCalledFunction + " - " + e, false, false, FlxColor.RED);
-			}
+			retVal = hscript.execute(codeToRun);
 
 			if (retVal != null && !isOfTypes(retVal, [Bool, Int, Float, String, Array])) retVal = null;
 			return retVal;
 		});
 		Lua_helper.add_callback(lua, "addHaxeLibrary", function(libName:String, ?libPackage:String = ''){
 			initHaxeModule();
-			try {
-				var str:String = '';
-				if (libPackage.length > 0) str = libPackage + '.';
+			var str:String = '';
+			if (libPackage.length > 0) str = libPackage + '.';
 
-				hscript.interp.variables.set(libName, Type.resolveClass(str + libName));
-			}
-			catch (e:Dynamic) trace(scriptName + ":" + lastCalledFunction + " - " + e, false, false, FlxColor.RED);
+			hscript.interp.variables.set(libName, Type.resolveClass(str + libName));
 		});
 
 		if (registerCallback != null) registerCallback(this);
@@ -86,7 +78,7 @@ class LuaScript extends Script {
 		Lua.setglobal(lua, variable);
 	}
 
-	var lastCalledFunction:String = '';
+	public var lastCalledFunction:String = '';
     override function call(event:String, args:Array<Dynamic>):Dynamic {
 		if (lua == null) return Script.Function_Continue;
 
@@ -142,6 +134,7 @@ class LuaScript extends Script {
 		if (hscript == null) {
 			trace('initializing haxe interp for: $scriptName');
 			hscript = new HScript('', target); // TO DO: Fix issue with 2 scripts not being able to use the same variable names
+			hscript.parentLua = this;
 		}
 	}
 

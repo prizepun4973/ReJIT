@@ -25,8 +25,8 @@ import flash.media.Sound;
 
 using StringTools;
 
-class Paths
-{
+class Paths {
+
 	inline public static var SOUND_EXT = #if web "mp3" #else "ogg" #end;
 	inline public static var VIDEO_EXT = "mp4";
 
@@ -194,7 +194,7 @@ class Paths
 			
 		return 'mods/' + key + '.lua';
 	}
-	static public function hscript(key:String, ?library:String)
+	static public function hscript(key:String)
 	{
 		if (FileSystem.exists(mods(currentModDirectory + '/' + key + '.hx')) && currentModDirectory != "") {
 			return mods(currentModDirectory + '/' + key + '.hx');

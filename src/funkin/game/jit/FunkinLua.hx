@@ -3103,17 +3103,15 @@ class FunkinLua
 		if (hscript == null) {
 			trace('initializing haxe interp for: $scriptName');
 			hscript = new HScript('', getInstance()); // TO DO: Fix issue with 2 scripts not being able to use the same variable names
+			hscript.parentLua = this;
 		}
 	}
 
-	public static function setVarInArray(instance:Dynamic, variable:String, value:Dynamic):Any
-	{
+	public static function setVarInArray(instance:Dynamic, variable:String, value:Dynamic):Any {
 		var shit:Array<String> = variable.split('[');
-		if (shit.length > 1)
-		{
+		if (shit.length > 1) {
 			var blah:Dynamic = null;
-			if (PlayState.instance.variables.exists(shit[0]))
-			{
+			if (PlayState.instance.variables.exists(shit[0])) {
 				var retVal:Dynamic = PlayState.instance.variables.get(shit[0]);
 				if (retVal != null)
 					blah = retVal;
@@ -3121,8 +3119,7 @@ class FunkinLua
 			else
 				blah = Reflect.getProperty(instance, shit[0]);
 
-			for (i in 1...shit.length)
-			{
+			for (i in 1...shit.length) {
 				var leNum:Dynamic = shit[i].substr(0, shit[i].length - 1);
 				if (i >= shit.length - 1) // Last array
 					blah[leNum] = value;

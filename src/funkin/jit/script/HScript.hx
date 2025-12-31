@@ -87,6 +87,7 @@ class HScript extends Script {
     public var code:String = "";
 
     public var path:String;
+	public var parentLua:Dynamic = null; // LuaScript
 
 	public function new(path:String, target:FlxState) {
         super(path, target);
@@ -99,12 +100,15 @@ class HScript extends Script {
         interp.variables.set("trace", Reflect.makeVarArgs((args) -> {
 			var v:String = Std.string(args.shift());
 			for (a in args) v += ", " + Std.string(a);
-			this.trace(v);
+			Sys.println(path + '.hx: ' + Std.string(v));
 		}));
 
         setup();
 
-        if (FileSystem.exists(Paths.hscript(path))) execute(File.getContent(Paths.hscript(path)));
+        if (FileSystem.exists(path) && !StringTools.endsWith(path, ".lua")) {
+			trace("path: " + path);
+			execute(File.getContent(path));
+		}
 	}
 
 	public function execute(codeToRun:String):Dynamic {
@@ -118,7 +122,7 @@ class HScript extends Script {
 			return interp.execute(parser.parseString(codeToRun));
 		}
 		catch (e:Dynamic) {
-			Sys.println(e);
+			Sys.println(StringTools.replace(e, "hscript:", path + (parentLua != null ? parentLua.scriptName + " - " + parentLua.lastCalledFunction : "") + ": "));
 			return null;
 		}
 	}
@@ -144,11 +148,6 @@ class HScript extends Script {
 		}
 		
 		return null;
-	}
-
-	public function trace(v:Dynamic) {
-        if (path == "") Sys.println(Std.string(v));
-		else Sys.println(path + '.hx: ' + Std.string(v));
 	}
 
 	public static function loadMappings() {
