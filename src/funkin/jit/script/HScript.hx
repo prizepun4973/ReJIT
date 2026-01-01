@@ -28,27 +28,27 @@ class HScript extends Script {
 			for (i in registeredClass) {
 				var libName = i.className;
 				var libPackage = i.classPackage;
-				interp.variables.set(libName, Type.resolveClass(libPackage != "" ? libPackage + "." + libName : libName));
+				var libResult = Type.resolveClass(libPackage != "" ? libPackage + "." + libName : libName);
+				interp.variables.set(libName, libResult);
 			}
 		}
-		
 
-		interp.variables.set('Function_Stop', Script.Function_Stop);
-		interp.variables.set('Function_Continue', Script.Function_Continue);
-		interp.variables.set('Function_StopLua', Script.Function_StopLua);
+		set('Function_Stop', Script.Function_Stop);
+		set('Function_Continue', Script.Function_Continue);
+		set('Function_StopLua', Script.Function_StopLua);
 		
         /**
 		 * lua jit
 		 */
-		interp.variables.set('game', 'PlayState.instance');
-		interp.variables.set('CustomSubstate', funkin.game.jit.FunkinLua.CustomSubstate);
+		set('game', PlayState.instance);
+		set('CustomSubstate', funkin.game.jit.FunkinLua.CustomSubstate);
 
-		interp.variables.set('setVar', function(name:String, value:Dynamic) { convertedParent().variables.set(name, value); });
-		interp.variables.set('getVar', function(name:String){ 
+		set('setVar', function(name:String, value:Dynamic) { convertedParent().variables.set(name, value); });
+		set('getVar', function(name:String){ 
 			if (convertedParent().variables.exists(name)) return convertedParent().variables.get(name);
 			return null;
 		});
-		interp.variables.set('removeVar', function(name:String) {
+		set('removeVar', function(name:String) {
 			if (convertedParent().variables.exists(name)) {
 				convertedParent().variables.remove(name);
 				return true;
@@ -97,7 +97,7 @@ class HScript extends Script {
         this.path = path;
 
         // https://github.com/CodenameCrew/CodenameEngine
-        interp.variables.set("trace", Reflect.makeVarArgs((args) -> {
+        set("trace", Reflect.makeVarArgs((args) -> {
 			var v:String = Std.string(args.shift());
 			for (a in args) v += ", " + Std.string(a);
 			Sys.println(path + '.hx: ' + Std.string(v));
@@ -111,25 +111,9 @@ class HScript extends Script {
 		}
 	}
 
-	public function execute(codeToRun:String):Dynamic {
-		@:privateAccess
-		parser.line = 1;
-		parser.allowTypes = true;
-
-        code = codeToRun;
-
-		try {
-			return interp.execute(parser.parseString(codeToRun));
-		}
-		catch (e:Dynamic) {
-			Sys.println(StringTools.replace(e, "hscript:", path + (parentLua != null ? parentLua.scriptName + " - " + parentLua.lastCalledFunction : "") + ": "));
-			return null;
-		}
+	override function set(name:String, value:Any) {
+		interp.variables.set(name, value);
 	}
-
-    function convertedParent():Dynamic {
-        return Std.isOfType(target, IModState) ? (cast (target, IModState)) : (cast (target, PlayState));
-    }
 
 	// https://github.com/CodenameCrew/CodenameEngine
 	override function call(funcName:String, args:Array<Dynamic>) {
@@ -149,6 +133,26 @@ class HScript extends Script {
 		
 		return null;
 	}
+	
+	public function execute(codeToRun:String):Dynamic {
+		@:privateAccess
+		parser.line = 1;
+		parser.allowTypes = true;
+
+        code = codeToRun;
+
+		try {
+			return interp.execute(parser.parseString(codeToRun));
+		}
+		catch (e:Dynamic) {
+			Sys.println(StringTools.replace(e, "hscript:", path + (parentLua != null ? parentLua.scriptName + " - " + parentLua.lastCalledFunction : "") + ": "));
+			return null;
+		}
+	}
+
+    function convertedParent():Dynamic {
+        return Std.isOfType(target, IModState) ? (cast (target, IModState)) : (cast (target, PlayState));
+    }
 
 	public static function loadMappings() {
 		if (!FileSystem.exists("mappings.json")) return;

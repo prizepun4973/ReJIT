@@ -165,8 +165,7 @@ class Rating
 	public var score:Int = 350;
 	public var noteSplash:Bool = true;
 
-	public function new(name:String)
-	{
+	public function new(name:String) {
 		this.name = name;
 		this.image = name;
 		this.counter = name + 's';

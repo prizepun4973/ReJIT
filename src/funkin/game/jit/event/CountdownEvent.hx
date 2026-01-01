@@ -1,5 +1,6 @@
 package funkin.game.jit.event;
 
+// https://github.com/CodenameCrew/CodenameEngine
 class CountdownEvent extends Cancellable {
     /**
 	 * At which count the countdown is.

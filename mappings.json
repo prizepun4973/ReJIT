@@ -25,15 +25,15 @@
     }, 
     {
         "className": "FlxEase",
-        "classPackage": "flixel"
+        "classPackage": "flixel.tweens"
     },
     {
         "className": "FlxRuntimeShader",
         "classPackage": "flixel.addons.display"
     },
     {
-        "className": "ShaderFliter",
-        "classPackage": "openfl.fliters"
+        "className": "ShaderFilter",
+        "classPackage": "openfl.fiLters"
     },
     {
         "className": "PlayState",
