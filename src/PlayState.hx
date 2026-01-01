@@ -4411,7 +4411,7 @@ class PlayState extends MusicBeatState {
 		if(daRating.noteSplash && !note.noteSplashDisabled) spawnNoteSplashOnNote(note);
 
 		if(!practiceMode && !cpuControlled) {
-			if (event.countScore) songScore += score;
+			songScore += score;
 			if(!note.ratingDisabled) {
 				songHits++;
 				totalPlayed++;
