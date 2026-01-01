@@ -4302,7 +4302,16 @@ class PlayState extends MusicBeatState {
 		callEvent('onNoteHit', event);
 		callEvent('onPlayerHit', event);
 
-		if (event.cancelled) return;
+		if (event.cancelled) {
+			if (!note.isSustainNote && deleteNote) {
+				note.kill();
+				notes.remove(note, true);
+				note.destroy();
+			}
+
+			callEvent('onPostNoteHit', event);
+			return;
+		}
 
 		if (cpuControlled && (note.ignoreNote || note.hitCausesMiss)) return;
 
@@ -4323,7 +4332,9 @@ class PlayState extends MusicBeatState {
 				}
 			}
 
-			if (!note.isSustainNote) {
+			callEvent('onPostNoteHit', event);
+
+			if (!note.isSustainNote && deleteNote) {
 				note.kill();
 				notes.remove(note, true);
 				note.destroy();
@@ -4374,12 +4385,14 @@ class PlayState extends MusicBeatState {
 		var leData:Int = Math.round(Math.abs(note.noteData));
 		var leType:String = note.noteType;
 		callOnLuas('goodNoteHit', [notes.members.indexOf(note), leData, leType, isSus]);
-
-		if (!note.isSustainNote) {
+		
+		if (!note.isSustainNote && deleteNote) {
 			note.kill();
 			notes.remove(note, true);
 			note.destroy();
 		}
+		
+		callEvent('onPostNoteHit', event);
 	}
 
 	private function popUpScore(note:Note = null, event:NoteHitEvent):Void {
