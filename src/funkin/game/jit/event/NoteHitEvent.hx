@@ -5,29 +5,6 @@ import funkin.game.component.*;
 // https://github.com/CodenameCrew/CodenameEngine
 class NoteHitEvent extends Cancellable {
 	/**
-	 * Whether this hit increases combo.
-	 */
-	public var countAsCombo:Bool = true;
-	/**
-	 * Whether this hit increases the score
-	 */
-	public var countScore:Bool = true;
-
-	/**
-	 * Whenever ratings (Rating sprite, Digits sprites and Combo sprite) should be shown or not.
-	 *
-	 * NOTE: Whether it's `true` use `displayRating` and `displayCombo` (plus `minDigitDisplay` in the PlayState class) to change what's going to pop up!
-	 */
-	public var showRating:Bool = true;
-	/**
-	 * Whenever the Rating sprites should be shown or not.
-	 */
-	public var displayRating:Bool = true;
-	/**
-	 * Whenever the Combo sprite should be shown or not (like old Week 7 patches).
-	 */
-	public var displayCombo:Bool = true;
-	/**
 	 * Note that has been pressed
 	 */
 	public var note:Note;
