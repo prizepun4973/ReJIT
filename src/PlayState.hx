@@ -3111,40 +3111,26 @@ class PlayState extends MusicBeatState {
 							}
 						}
 
-						if (!daNote.mustPress && daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote)
-						{
-							opponentNoteHit(daNote);
-						}
+						if (!daNote.mustPress && daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote) opponentNoteHit(daNote);
 
 						if(!daNote.blockHit && daNote.mustPress && cpuControlled && daNote.canBeHit) {
-							if(daNote.isSustainNote) {
-								if(daNote.canBeHit) {
-									goodNoteHit(daNote);
-								}
-							} else if(daNote.strumTime <= Conductor.songPosition || daNote.isSustainNote) {
-								goodNoteHit(daNote);
-							}
+							if(daNote.isSustainNote) if(daNote.canBeHit) goodNoteHit(daNote);
+							else if(daNote.strumTime <= Conductor.songPosition || daNote.isSustainNote) goodNoteHit(daNote);
 						}
 
 						var center:Float = strumY + Note.swagWidth / 2;
 						if(strumGroup.members[daNote.noteData].sustainReduce && daNote.isSustainNote && (daNote.mustPress || !daNote.ignoreNote) &&
-							(!daNote.mustPress || (daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit))))
-						{
-							if (strumScroll)
-							{
-								if(daNote.y - daNote.offset.y * daNote.scale.y + daNote.height >= center)
-								{
+							(!daNote.mustPress || (daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit)))) {
+							if (strumScroll) {
+								if(daNote.y - daNote.offset.y * daNote.scale.y + daNote.height >= center) {
 									var swagRect = new FlxRect(0, 0, daNote.frameWidth, daNote.frameHeight);
 									swagRect.height = (center - daNote.y) / daNote.scale.y;
 									swagRect.y = daNote.frameHeight - swagRect.height;
 
 									daNote.clipRect = swagRect;
 								}
-							}
-							else
-							{
-								if (daNote.y + daNote.offset.y * daNote.scale.y <= center)
-								{
+							} else {
+								if (daNote.y + daNote.offset.y * daNote.scale.y <= center) {
 									var swagRect = new FlxRect(0, 0, daNote.width / daNote.scale.x, daNote.height / daNote.scale.y);
 									swagRect.y = (center - daNote.y) / daNote.scale.y;
 									swagRect.height -= swagRect.y;
@@ -4254,8 +4240,7 @@ class PlayState extends MusicBeatState {
 		} else if(!note.noAnimation) {
 			var altAnim:String = note.animSuffix;
 
-			if (SONG.notes[curSection] != null)
-			{
+			if (SONG.notes[curSection] != null) {
 				if (SONG.notes[curSection].altAnim && !SONG.notes[curSection].gfSection) {
 					altAnim = '-alt';
 				}
@@ -4319,7 +4304,16 @@ class PlayState extends MusicBeatState {
 
 		if (ClientPrefs.hitsoundVolume > 0 && !note.hitsoundDisabled) FlxG.sound.play(Paths.sound('hitsound'), ClientPrefs.hitsoundVolume);
 
-		callOnLuas('goodNoteHit', [notes.members.indexOf(note), leData, leType, isSus]);
+		if (callOnLuas('goodNoteHit', [notes.members.indexOf(note), leData, leType, isSus]) == FunkinLua.Function_Stop || event.cancelled) {
+			if (event.deleteNote) {
+				note.kill();
+				notes.remove(note, true);
+				note.destroy();
+			}
+
+			callOnLuas('onPostNoteHit', [notes.members.indexOf(note), leData, leType, isSus]);
+			callEvent('onPostNoteHit', event);
+		}
 
 		if(note.hitCausesMiss) noteMiss(note);
 		
@@ -4497,35 +4491,25 @@ class PlayState extends MusicBeatState {
 			event.character.holdTimer = 0;
 
 			switch(note.noteType) {
-			case 'Hurt Note': //Hurt note
-				if(boyfriend.animation.getByName('hurt') != null && !note.noMissAnimation) {
-					boyfriend.playAnim('hurt', true);
-					boyfriend.specialAnim = true;
-				}
-			case 'Hey!':
-				if(!note.noAnimation) {
-					var animToPlay:String = singAnimations[Std.int(Math.abs(note.noteData))];
-
-					if(note.gfNote && gf != null) {
-						gf.playAnim(animToPlay + note.animSuffix, true);
-						gf.holdTimer = 0;
-					} else {
-						boyfriend.playAnim(animToPlay + note.animSuffix, true);
-						boyfriend.holdTimer = 0;
-					}
-
-					if(boyfriend.animOffsets.exists('hey')) {
-						boyfriend.playAnim('hey', true);
+				case 'Hurt Note': //Hurt note
+					if(boyfriend.animation.getByName('hurt') != null && !note.noMissAnimation) {
+						boyfriend.playAnim('hurt', true);
 						boyfriend.specialAnim = true;
-						boyfriend.heyTimer = 0.6;
 					}
+				case 'Hey!':
+					if(!note.noAnimation) {
+						if(boyfriend.animOffsets.exists('hey')) {
+							boyfriend.playAnim('hey', true);
+							boyfriend.specialAnim = true;
+							boyfriend.heyTimer = 0.6;
+						}
 
-					if(gf != null && gf.animOffsets.exists('cheer')) {
-						gf.playAnim('cheer', true);
-						gf.specialAnim = true;
-						gf.heyTimer = 0.6;
+						if(gf != null && gf.animOffsets.exists('cheer')) {
+							gf.playAnim('cheer', true);
+							gf.specialAnim = true;
+							gf.heyTimer = 0.6;
+						}
 					}
-				}
 			}
 		}
 
@@ -4548,6 +4532,9 @@ class PlayState extends MusicBeatState {
 			notes.remove(note, true);
 			note.destroy();
 		}
+
+		callOnLuas('onPostNoteHit', [notes.members.indexOf(note), leData, leType, isSus]);
+		callEvent('onPostNoteHit', event);
 	}
 
 	public function spawnNoteSplashOnNote(note:Note) {
