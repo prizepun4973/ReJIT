@@ -1873,8 +1873,9 @@ class PlayState extends MusicBeatState {
 						if (!daNote.mustPress && daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote) opponentNoteHit(daNote);
 
 						if(!daNote.blockHit && daNote.mustPress && cpuControlled && daNote.canBeHit) {
-							if(daNote.isSustainNote) if(daNote.canBeHit) goodNoteHit(daNote);
-							else if(daNote.strumTime <= Conductor.songPosition || daNote.isSustainNote) goodNoteHit(daNote);
+							if(daNote.isSustainNote) {
+								if(daNote.canBeHit) goodNoteHit(daNote);
+							} else if(daNote.strumTime <= Conductor.songPosition || daNote.isSustainNote) goodNoteHit(daNote);
 						}
 
 						var center:Float = strumY + Note.swagWidth / 2;
@@ -3005,10 +3006,7 @@ class PlayState extends MusicBeatState {
 					insert(members.indexOf(strumLineNotes), numScore);
 
 				FlxTween.tween(numScore, {alpha: 0}, 0.2 / playbackRate, {
-					onComplete: function(tween:FlxTween)
-					{
-						numScore.destroy();
-					},
+					onComplete: function(tween:FlxTween) { numScore.destroy(); },
 					startDelay: Conductor.crochet * 0.002 / playbackRate
 				});
 
