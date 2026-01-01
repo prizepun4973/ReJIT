@@ -20,11 +20,11 @@ class NoteHitEvent extends Cancellable {
 	/**
 	 * Prefix of the rating sprite path. Defaults to "game/score/"
 	 */
-	public var ratingPrefix:String = "";
+	public var ratingPrefix:String = !PlayState.isPixelStage ? "" : 'pixelUI/';
 	/**
 	 * Suffix of the rating sprite path.
 	 */
-	public var ratingSuffix:String = "";
+	public var ratingSuffix:String = !PlayState.isPixelStage ? "" : '-pixel';
 
 	/**
 	 * Score gained after note press.
@@ -42,15 +42,15 @@ class NoteHitEvent extends Cancellable {
 	/**
 	 * Whenever antialiasing should be enabled on combo number.
 	 */
-	public var numAntialiasing:Bool = ClientPrefs.globalAntialiasing;
+	public var numAntialiasing:Bool = !PlayState.isPixelStage ? ClientPrefs.globalAntialiasing : false;
 	/**
 	 * Scale of ratings.
 	 */
-	public var ratingScale:Float = !PlayState.isPixelStage ? 0.7 : 0.85; // TODO: 0.7
+	public var ratingScale:Float = !PlayState.isPixelStage ? 0.7 : 5.1; // TODO: 0.7
 	/**
 	 * Whenever antialiasing should be enabled on ratings.
 	 */
-	public var ratingAntialiasing:Bool = ClientPrefs.globalAntialiasing;
+	public var ratingAntialiasing:Bool = !PlayState.isPixelStage ? ClientPrefs.globalAntialiasing : false;
 
     public function new(note:Note, character:Character, player:Bool, score:Int, healthGain:Float) {
         super();
