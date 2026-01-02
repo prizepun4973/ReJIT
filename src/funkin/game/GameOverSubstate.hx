@@ -119,7 +119,7 @@ class GameOverSubstate extends InjectedSubState
 			}
 
 			if (boyfriend.animation.curAnim.finished && !playingDeathSound) {
-				FlxG.sound.playMusic(Paths.music(loopSoundName), volume);
+				FlxG.sound.playMusic(Paths.music(loopSoundName), 1);
 				boyfriend.startedDeath = true;
 			}
 		}

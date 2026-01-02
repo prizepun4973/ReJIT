@@ -185,6 +185,12 @@ class MainMenuState extends InjectedState
 				changeItem(1);
 			}
 
+			if(FlxG.mouse.wheel != 0)
+			{
+				FlxG.sound.play(Paths.sound('scrollMenu'), 0.2);
+				changeItem(-FlxG.mouse.wheel);
+			}
+
 			if (controls.BACK)
 			{
 				selectedSomethin = true;
@@ -192,7 +198,7 @@ class MainMenuState extends InjectedState
 				MusicBeatState.switchState(new TitleState());
 			}
 
-			if (controls.ACCEPT)
+			if (controls.ACCEPT || FlxG.mouse.justPressed)
 			{
 				selectedSomethin = true;
 				FlxG.sound.play(Paths.sound('confirmMenu'));
