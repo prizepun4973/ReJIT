@@ -48,7 +48,7 @@
 	<library name="assets" preload="true"/>
 	<assets path="assets/" rename="assets"/>
 	
-	<assets path='example_mods' rename='mods' embed='false'/>
+	<assets path='mods' embed='false'/>
 	<assets path='mappings.json' embed='false'/>
 	<assets path="do NOT readme.txt" embed='false'/>
 	
