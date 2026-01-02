@@ -1,5 +1,5 @@
 [submodule "art"]
-	path = art
+	path = art/icons
 	url = https://github.com/prizepun4973/art
 [submodule "assets"]
 	path = assets

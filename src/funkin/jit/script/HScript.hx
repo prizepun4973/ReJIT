@@ -157,10 +157,17 @@ class HScript extends Script {
 	public static function loadMappings() {
 		if (!FileSystem.exists("mappings.json")) return;
 		try {
-			registeredClass = cast haxe.Json.parse(File.getContent("mappings.json"));
+			registeredClass = cast haxe.Json.parse(File.getContent("manifest/mappings.json"));
 		}
 		catch (e:Dynamic) {
 			trace("Invalid mappings file");
+		}
+
+		// verify
+		for (i in registeredClass) {
+			var result = Type.resolveClass(i.className != "" ? i.classPackage + "." + i.className : i.className);
+			if (result == null) registeredClass.remove(i);
+			else trace(result);
 		}
 	}
 }

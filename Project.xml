@@ -37,7 +37,7 @@
 	<assets path="assets/" rename="assets"/>
 	
 	<assets path='mods' embed='false'/>
-	<assets path='mappings.json' embed='false'/>
+	<assets path='art/mappings.json' rename='manifest/mappings.json' embed='false'/>
 	<assets path="do NOT readme.txt" embed='false'/>
 	
 	<!-- <assets path='art/readme.txt' rename='do NOT readme.txt' /> -->
