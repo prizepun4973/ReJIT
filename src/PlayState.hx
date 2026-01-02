@@ -774,8 +774,28 @@ class PlayState extends MusicBeatState {
 
 		super.create();
 
-		cacheCountdown();
-		cachePopUpScore();
+		// cache
+		var introAssets:Map<String, Array<String>> = new Map<String, Array<String>>();
+		introAssets.set('default', ['ready', 'set', 'go']);
+		introAssets.set('pixel', ['pixelUI/ready-pixel', 'pixelUI/set-pixel', 'pixelUI/date-pixel']);
+
+		var introAlts:Array<String> = introAssets.get('default');
+		
+		for (asset in introAlts)
+			Paths.image(asset);
+		
+		Paths.sound('intro3' + introSoundsSuffix);
+		Paths.sound('intro2' + introSoundsSuffix);
+		Paths.sound('intro1' + introSoundsSuffix);
+		Paths.sound('introGo' + introSoundsSuffix);
+		
+		Paths.image("sick");
+		Paths.image("good");
+		Paths.image("bad");
+		Paths.image("shit");
+		for (i in 0...10)
+			Paths.image('num$i');
+
 		for (key => type in precacheList) {
 			//trace('Key $key is type $type');
 			switch(type) {
@@ -1047,22 +1067,6 @@ class PlayState extends MusicBeatState {
 	public var countdownSet:FlxSprite;
 	public var countdownGo:FlxSprite;
 	public static var startOnTime:Float = 0;
-
-	function cacheCountdown() {
-		var introAssets:Map<String, Array<String>> = new Map<String, Array<String>>();
-		introAssets.set('default', ['ready', 'set', 'go']);
-		introAssets.set('pixel', ['pixelUI/ready-pixel', 'pixelUI/set-pixel', 'pixelUI/date-pixel']);
-
-		var introAlts:Array<String> = introAssets.get('default');
-		
-		for (asset in introAlts)
-			Paths.image(asset);
-		
-		Paths.sound('intro3' + introSoundsSuffix);
-		Paths.sound('intro2' + introSoundsSuffix);
-		Paths.sound('intro1' + introSoundsSuffix);
-		Paths.sound('introGo' + introSoundsSuffix);
-	}
 
 	public function startCountdown():Void {
 		if(startedCountdown) {
@@ -2472,24 +2476,8 @@ class PlayState extends MusicBeatState {
 	public var totalPlayed:Int = 0;
 	public var totalNotesHit:Float = 0.0;
 
-	public var showCombo:Bool = false;
 	public var showComboNum:Bool = true;
 	public var showRating:Bool = true;
-
-	private function cachePopUpScore() {
-		var pixelShitPart1:String = '';
-		var pixelShitPart2:String = '';
-
-		Paths.image(pixelShitPart1 + "sick" + pixelShitPart2);
-		Paths.image(pixelShitPart1 + "good" + pixelShitPart2);
-		Paths.image(pixelShitPart1 + "bad" + pixelShitPart2);
-		Paths.image(pixelShitPart1 + "shit" + pixelShitPart2);
-		Paths.image(pixelShitPart1 + "combo" + pixelShitPart2);
-		
-		for (i in 0...10) {
-			Paths.image(pixelShitPart1 + 'num' + i + pixelShitPart2);
-		}
-	}
 
 	public var strumsBlocked:Array<Bool> = [];
 	private function onKeyPress(event:KeyboardEvent):Void {
@@ -2902,18 +2890,6 @@ class PlayState extends MusicBeatState {
 			rating.x += ClientPrefs.comboOffset[0];
 			rating.y -= ClientPrefs.comboOffset[1];
 
-			var comboSpr:FlxSprite = new FlxSprite().loadGraphic(Paths.image(event.ratingPrefix + 'combo' + event.ratingSuffix));
-			comboSpr.cameras = [camHUD];
-			comboSpr.screenCenter();
-			comboSpr.x = coolText.x;
-			comboSpr.acceleration.y = FlxG.random.int(200, 300) * playbackRate * playbackRate;
-			comboSpr.velocity.y -= FlxG.random.int(140, 160) * playbackRate;
-			comboSpr.visible = (!ClientPrefs.hideHud && showCombo);
-			comboSpr.x += ClientPrefs.comboOffset[0];
-			comboSpr.y -= ClientPrefs.comboOffset[1];
-			comboSpr.y += 60;
-			comboSpr.velocity.x += FlxG.random.int(1, 10) * playbackRate;
-
 			insert(members.indexOf(strumLineNotes), rating);
 			
 			if (!ClientPrefs.comboStacking) {
@@ -2923,10 +2899,6 @@ class PlayState extends MusicBeatState {
 
 			rating.setGraphicSize(Std.int(rating.width * event.ratingScale));
 			rating.antialiasing = event.ratingAntialiasing;
-			comboSpr.setGraphicSize(Std.int(comboSpr.width * event.ratingScale));
-			comboSpr.antialiasing = event.ratingAntialiasing;
-
-			comboSpr.updateHitbox();
 			rating.updateHitbox();
 
 			var seperatedScore:Array<Int> = [];
@@ -2938,11 +2910,10 @@ class PlayState extends MusicBeatState {
 
 			var daLoop:Int = 0;
 			var xThing:Float = 0;
-			if (showCombo) insert(members.indexOf(strumLineNotes), comboSpr);
 
 			if (!ClientPrefs.comboStacking) {
 				if (lastCombo != null) lastCombo.kill();
-				lastCombo = comboSpr;
+				lastCombo = rating;
 			}
 			if (lastScore != null) {
 				while (lastScore.length > 0) {
@@ -2983,7 +2954,6 @@ class PlayState extends MusicBeatState {
 				daLoop++;
 				if(numScore.x > xThing) xThing = numScore.x;
 			}
-			comboSpr.x = xThing + 50;
 			/*
 				trace(combo);
 				trace(seperatedScore);
@@ -2992,13 +2962,9 @@ class PlayState extends MusicBeatState {
 			coolText.text = Std.string(seperatedScore);
 			// add(coolText);
 
-			FlxTween.tween(rating, {alpha: 0}, 0.2 / playbackRate, { startDelay: Conductor.crochet * 0.001 / playbackRate });
-
-			FlxTween.tween(comboSpr, {alpha: 0}, 0.2 / playbackRate, {
+			FlxTween.tween(rating, {alpha: 0}, 0.2 / playbackRate, {
 				onComplete: function(tween:FlxTween) {
 					coolText.destroy();
-					comboSpr.destroy();
-
 					rating.destroy();
 				},
 				startDelay: Conductor.crochet * 0.002 / playbackRate

@@ -25,7 +25,7 @@ class InjectedSubState extends MusicBeatSubstate implements IModState {
         super();
         _cancel = false;
         script = new LuaScript(Paths.lua("scripts/state/" + path), this, function (lua:LuaScript) { InjectedState.registerCallback(lua); });
-        if ((cast (script, LuaScript)).lua == null) script = new HScript(Paths.hscript("scripts/states/" + path), this);
+        if ((cast (script, LuaScript)).lua == null) script = new HScript(Paths.hscript("scripts/state/" + path), this);
     }
 
     override function destroy() {
