@@ -1240,28 +1240,6 @@ class PlayState extends MusicBeatState {
 		}
 	}
 
-	public function updateScore(miss:Bool = false) {
-		scoreTxt.text = 'Score: ' + songScore
-		+ ' | Misses: ' + songMisses
-		+ ' | Rating: ' + ratingName
-		+ (ratingName != '?' ? ' (${Highscore.floorDecimal(ratingPercent * 100, 2)}%) - $ratingFC' : '');
- 
-		if(ClientPrefs.scoreZoom && !miss && !cpuControlled)
-		{
-			if(scoreTxtTween != null) {
-				scoreTxtTween.cancel();
-			}
-			scoreTxt.scale.x = 1.075;
-			scoreTxt.scale.y = 1.075;
-			scoreTxtTween = FlxTween.tween(scoreTxt.scale, {x: 1, y: 1}, 0.2, {
-				onComplete: function(twn:FlxTween) {
-					scoreTxtTween = null;
-				}
-			});
-		}
-		callOnLuas('onUpdateScore', [miss]);
-	}
-
 	public function setSongTime(time:Float) {
 
 		if(time < 0) time = 0;
@@ -1601,6 +1579,9 @@ class PlayState extends MusicBeatState {
 	}
 
 	override function closeSubState() {
+
+		if (callOnLuas('onSubStateClose', []) || callEvent("onSubstateClose", new Cancellable()).cancelled) return;
+
 		if (paused) {
 			if (FlxG.sound.music != null && !startingSong) resyncVocals();
 
@@ -1612,30 +1593,20 @@ class PlayState extends MusicBeatState {
 				songSpeedTween.active = true;
 
 			var chars:Array<Character> = [boyfriend, gf, dad];
-			for (char in chars) {
-				if(char != null && char.colorTween != null) {
-					char.colorTween.active = true;
-				}
-			}
+			for (char in chars)
+				if(char != null && char.colorTween != null) char.colorTween.active = true;
 
-			for (tween in modchartTweens) {
+			for (tween in modchartTweens)
 				tween.active = true;
-			}
-			for (timer in modchartTimers) {
+			for (timer in modchartTimers)
 				timer.active = true;
-			}
+
 			paused = false;
 			callOnLuas('onResume', []);
 
 			#if desktop
-			if (startTimer != null && startTimer.finished)
-			{
-				DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter(), true, songLength - Conductor.songPosition - ClientPrefs.noteOffset);
-			}
-			else
-			{
-				DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
-			}
+			if (startTimer != null && startTimer.finished) DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter(), true, songLength - Conductor.songPosition - ClientPrefs.noteOffset);
+			else DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
 			#end
 		}
 
@@ -3337,7 +3308,20 @@ class PlayState extends MusicBeatState {
 		if (songMisses > 0 && songMisses < 10) ratingFC = "SDCB";
 		else if (songMisses >= 10) ratingFC = "Clear";
 
-		updateScore(badHit); // score will only update after rating is calculated, if it's a badHit, it shouldn't bounce -Ghost
+		// score will only update after rating is calculated, if it's a badHit, it shouldn't bounce -Ghost
+		scoreTxt.text = 'Score: ' + songScore
+		+ ' | Misses: ' + songMisses
+		+ ' | Rating: ' + ratingName
+		+ (ratingName != '?' ? ' (${Highscore.floorDecimal(ratingPercent * 100, 2)}%) - $ratingFC' : '');
+ 
+		if(ClientPrefs.scoreZoom && !badHit && !cpuControlled) {
+			if(scoreTxtTween != null) scoreTxtTween.cancel();
+			scoreTxt.scale.x = 1.075;
+			scoreTxt.scale.y = 1.075;
+			scoreTxtTween = FlxTween.tween(scoreTxt.scale, {x: 1, y: 1}, 0.2, { onComplete: function(twn:FlxTween) { scoreTxtTween = null; } });
+		}
+		callOnLuas('onUpdateScore', [badHit]);
+
 		setOnLuas('rating', ratingPercent);
 		setOnLuas('ratingName', ratingName);
 		setOnLuas('ratingFC', ratingFC);
