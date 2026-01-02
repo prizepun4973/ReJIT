@@ -2948,7 +2948,7 @@ class PlayState extends MusicBeatState {
 
 				FlxTween.tween(numScore, {alpha: 0}, 0.2 / playbackRate, {
 					onComplete: function(tween:FlxTween) { numScore.destroy(); },
-					startDelay: Conductor.crochet * 0.002 / playbackRate
+					startDelay: Conductor.crochet * 0.001 / playbackRate
 				});
 
 				daLoop++;
@@ -2967,7 +2967,7 @@ class PlayState extends MusicBeatState {
 					coolText.destroy();
 					rating.destroy();
 				},
-				startDelay: Conductor.crochet * 0.002 / playbackRate
+				startDelay: Conductor.crochet * 0.001 / playbackRate
 			});
 		}
 		health += event.healthGain;
