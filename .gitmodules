@@ -7,3 +7,6 @@
 [submodule "example_mods"]
 	path = example_mods
 	url = https://github.com/prizepun4973/modTemplate
+[submodule "mods/modTemplate"]
+	path = mods/modTemplate
+	url = https://github.com/prizepun4973/modTemplate
