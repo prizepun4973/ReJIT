@@ -1222,6 +1222,7 @@ class PlayState extends MusicBeatState {
 				daNote.kill();
 				unspawnNotes.remove(daNote);
 				daNote.destroy();
+				daNote = null;
 			}
 			--i;
 		}
@@ -1237,6 +1238,7 @@ class PlayState extends MusicBeatState {
 				daNote.kill();
 				notes.remove(daNote, true);
 				daNote.destroy();
+				daNote = null;
 			}
 			--i;
 		}
@@ -1882,6 +1884,7 @@ class PlayState extends MusicBeatState {
 							daNote.kill();
 							notes.remove(daNote, true);
 							daNote.destroy();
+							daNote = null;
 						}
 					});
 				} else {
@@ -2464,6 +2467,7 @@ class PlayState extends MusicBeatState {
 			daNote.kill();
 			notes.remove(daNote, true);
 			daNote.destroy();
+			daNote = null;
 		}
 		unspawnNotes = [];
 		eventNotes = [];
@@ -2513,6 +2517,7 @@ class PlayState extends MusicBeatState {
 								doubleNote.kill();
 								notes.remove(doubleNote, true);
 								doubleNote.destroy();
+								doubleNote = null;
 							} else notesStopped = true;
 						}
 
@@ -2646,6 +2651,7 @@ class PlayState extends MusicBeatState {
 					note.kill();
 					notes.remove(note, true);
 					note.destroy();
+					note = null;
 				}
 			});
 			return;
@@ -2681,6 +2687,7 @@ class PlayState extends MusicBeatState {
 				note.kill();
 				notes.remove(note, true);
 				note.destroy();
+				note = null;
 			}
 		});
 	}
@@ -2747,6 +2754,7 @@ class PlayState extends MusicBeatState {
 				note.kill();
 				notes.remove(note, true);
 				note.destroy();
+				note = null;
 			}
 
 			return;
@@ -2785,6 +2793,7 @@ class PlayState extends MusicBeatState {
 			note.kill();
 			notes.remove(note, true);
 			note.destroy();
+			note = null;
 		}
 	}
 
@@ -2819,6 +2828,7 @@ class PlayState extends MusicBeatState {
 				note.kill();
 				notes.remove(note, true);
 				note.destroy();
+				note = null;
 			}
 			return;
 		}
@@ -3019,6 +3029,7 @@ class PlayState extends MusicBeatState {
 			note.kill();
 			notes.remove(note, true);
 			note.destroy();
+			note = null;
 		}
 	}
 
