@@ -501,12 +501,12 @@ class ChartEditorState extends InjectedState {
         if (crosshair.visible) {
             if (FlxG.mouse.pressed && !FlxG.keys.pressed.CONTROL && !FlxG.keys.pressed.SHIFT && crosshair.target == null && paused) {
                 if (FlxG.mouse.x > gridBG.x + GRID_SIZE) {
-                    addAction(new NoteAddAction(
+                    addAction(new EditorAddAction(
                         crosshair.chained? crosshair.chainedMousePos : getMousePos(), 
                         Math.floor((FlxG.mouse.x - gridBG.x - GRID_SIZE) / GRID_SIZE))
                     );
                 }
-                else addAction(new EventAddAction(crosshair.chained? crosshair.chainedMousePos : getMousePos()));
+                else addAction(new EditorAddAction(crosshair.chained? crosshair.chainedMousePos : getMousePos()));
             }
 
             if (FlxG.mouse.pressedRight && !FlxG.keys.pressed.CONTROL && crosshair.target != null && !FlxG.keys.pressed.SHIFT && paused) {
