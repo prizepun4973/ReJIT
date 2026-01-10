@@ -125,6 +125,8 @@ class ChartEditorState extends InjectedState {
             }
         });
 
+        data[element.dataID].set('wasSelected', wasSelected);
+
         renderNotes.remove(element);
     }
 

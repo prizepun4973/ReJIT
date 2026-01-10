@@ -38,7 +38,7 @@ class ElementRemoveAction extends ChartEditorState.EditorAction {
                 if (Std.isOfType(spr, GuiElement)) {
                     var element:GuiElement = cast (spr, GuiElement);
                     if (((Std.isOfType(element, GuiNote) && ChartEditorState.data[i].exists('noteData')) || (Std.isOfType(element, GuiEventNote) && !ChartEditorState.data[i].exists('noteData')))
-                        && element.strumTime == ChartEditorState.data[i].get('strumTime')) editor.renderNotes.remove(element);
+                        && element.strumTime == ChartEditorState.data[i].get('strumTime')) editor.removeElement(element);
                 }
             });
         }

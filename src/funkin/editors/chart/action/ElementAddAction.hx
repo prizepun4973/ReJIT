@@ -26,7 +26,7 @@ class ElementAddAction extends ChartEditorState.EditorAction {
         if (datas.length > 0) {
             for (i in datas) {
                 var data = ChartEditorState.data[i];
-                trace(data);
+                // trace(data);
                 if (ChartEditorState.data[i].exists('noteData')) {
                     var note:GuiNote = new GuiNote(false, data.get('strumTime'), data.get('noteData'), data.get('susLength'));
                     note.noteType = data.get('noteType');
@@ -49,8 +49,8 @@ class ElementAddAction extends ChartEditorState.EditorAction {
     }
 
     override function undo() {
-        trace(datas);
-        trace(ChartEditorState.data);
+        // trace(datas);
+        // trace(ChartEditorState.data);
         for (i in datas) {
             editor.renderNotes.forEach(function (spr:FlxSprite) {
                 if (Std.isOfType(spr, GuiElement)) {
