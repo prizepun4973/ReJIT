@@ -5,6 +5,8 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.FlxSprite;
 
+import lime.ui.*;
+
 class TextBoxWidget extends FlxSprite {
     var onChange:Void -> Void;
     var displayText:FlxText;
@@ -25,6 +27,8 @@ class TextBoxWidget extends FlxSprite {
         parent.add(this);
         parent.add(displayText);
         this.onChange = onChange;
+
+        FlxG.stage.window.onKeyDown.add(onKeyDown);
     }
 
     override function update(elapsed:Float) {
@@ -35,9 +39,31 @@ class TextBoxWidget extends FlxSprite {
             if (!hovering && editing) onChange();
             editing = hovering;
         }
+    }
 
-        if (editing) {
-            
+    public function onKeyDown(e:KeyCode, modifier:KeyModifier) {
+        
+        var soundKey:Bool = false;
+        for (i in [FlxG.sound.muteKeys, FlxG.sound.volumeDownKeys, FlxG.sound.volumeUpKeys]) if (FlxG.keys.anyJustPressed(i)) soundKey = true;
+
+        if (editing && !soundKey) {
+            switch (e) {
+                case BACKSPACE:
+                    // delete
+                case DELETE:
+                    // delete:
+                case LEFT:
+                    // left
+                case RIGHT:
+                    //
+                case ESCAPE | RETURN:
+                    editing = false;
+                    onChange();
+
+                default:
+                    displayText.text = Std.string(FlxG.keys.firstJustPressed());
+            }
         }
+        
     }
 }
