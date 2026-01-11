@@ -40,6 +40,7 @@ jobs:
             cache-build-windows
       - name: Install Haxelib
         run: |
+          git submodule update --remote
           haxelib install flixel 5.5.0 --skip-dependencies --never
           haxelib install flixel-addons 3.2.0 --skip-dependencies --never
           haxelib install flixel-ui 2.6.0 --skip-dependencies --never
