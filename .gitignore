@@ -1,8 +1,8 @@
-### VS Code
 export/*
 .vscode/
 .idea/*
 *.code-workspace
+.haxelib/
 # Local history which shouldn't be shared.
 .history
 .ionide
