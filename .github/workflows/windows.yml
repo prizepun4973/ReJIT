@@ -17,7 +17,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  buildWindows:
+  win64:
     runs-on: windows-latest
     
     steps:
@@ -50,7 +50,6 @@ jobs:
             cache-build-windows
       - name: Install Haxelib
         run: |
-          git submodule update --remote
           haxelib install flixel 5.5.0 --skip-dependencies --never
           haxelib install flixel-addons 3.2.0 --skip-dependencies --never
           haxelib install flixel-ui 2.6.0 --skip-dependencies --never
@@ -69,7 +68,7 @@ jobs:
       - name: Publish Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windowsBuild
+          name: win64
           path: export/release/windows/bin
       # Thank you codename engine I will be stealing from you in the future!!
       # /j
