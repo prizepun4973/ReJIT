@@ -172,6 +172,10 @@ class CoolUtil
 		return colorNum != null ? colorNum : FlxColor.WHITE;
 	}
 
+	public static function mouseInRange(x1:Float, x2:Float, y1:Float, y2:Float) {
+		return FlxG.mouse.x > x1 && FlxG.mouse.x < x2 && FlxG.mouse.y > y1 && FlxG.mouse.y < y2;
+	}
+
 	public static function getStateByString(state:String):FlxState {
 		switch(state) {
 			default:
