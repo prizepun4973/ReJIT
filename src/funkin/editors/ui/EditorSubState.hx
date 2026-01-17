@@ -21,6 +21,14 @@ class EditorSubState extends funkin.jit.InjectedSubState {
         add(defaultGroup);
     }
 
+    public function setBG(w:Int, h:Int) {
+        var bg:FlxSprite = new FlxSprite(0, 0).makeGraphic(w, h, 0x64191919);
+        bg.centerOffsets();
+        bg.screenCenter();
+        defaultGroup.add(bg);
+        return bg;
+    }
+
     public function addButton(X:Float, Y:Float, text:String, onClick:Void -> Void) {
         var button:ButtonWidget = new ButtonWidget(this, X, Y, text, onClick);
         defaultGroup.add(button);

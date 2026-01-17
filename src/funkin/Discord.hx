@@ -15,7 +15,9 @@ class DiscordClient
 	public static var isInitialized:Bool = false;
 	private static final _defaultID:String = "863222024192262205";
 	public static var clientID(default, set):String = _defaultID;
+	#if hxdiscord_rpc
 	private static var presence:DiscordRichPresence = new DiscordRichPresence();
+	#end
 
 	public static function check()
 	{
@@ -42,9 +44,10 @@ class DiscordClient
 		isInitialized = false;
 		#end
 	}
-	
+
+	#if hxdiscord_rpc
 	private static function onReady(request:cpp.RawConstPointer<DiscordUser>):Void {
-		#if hxdiscord_rpc
+		
 		var requestPtr:cpp.Star<DiscordUser> = cpp.ConstPointer.fromRaw(request).ptr;
 
 		if (Std.parseInt(cast(requestPtr.discriminator, String)) != 0) //New Discord IDs/Discriminator system
@@ -52,9 +55,9 @@ class DiscordClient
 		else //Old discriminators
 			trace('(Discord) Connected to User (${cast(requestPtr.username, String)})');
 
-		changePresence();
-		#end
+		changePresence();	
 	}
+	#end
 
 	private static function onError(errorCode:Int, message:cpp.ConstCharStar):Void {
 		#if hxdiscord_rpc trace('Discord: Error ($errorCode: ${cast(message, String)})'); #end
