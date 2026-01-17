@@ -3153,9 +3153,6 @@ class PlayState extends MusicBeatState {
 	}
 
 	override function sectionHit() {
-
-		Paths.clearUnusedMemory();
-
 		super.sectionHit();
 
 		if (SONG.notes[curSection] != null) {
