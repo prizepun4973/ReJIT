@@ -123,20 +123,6 @@ class Paths {
 
 	public static function getPath(file:String, ?type:AssetType = AssetType.BINARY, ?library:Null<String> = null) {
 		if (library != null) return getLibraryPath(file, library);
-
-		if (currentLevel != null) {
-			var levelPath:String = '';
-			if(currentLevel != 'shared') {
-				levelPath = getLibraryPathForce(file, currentLevel);
-				if (OpenFlAssets.exists(levelPath, type))
-					return levelPath;
-			}
-
-			levelPath = getLibraryPathForce(file, "shared");
-			if (OpenFlAssets.exists(levelPath, type))
-				return levelPath;
-		}
-
 		return getPreloadPath(file);
 	}
 
@@ -176,34 +162,13 @@ class Paths {
 		return getPath('shaders/$key.vert', TEXT, library);
 	}
 	static public function ndll(key:String, ?library:String) {
-		if (FileSystem.exists(mods(currentModDirectory + '/ndlls/' + key + '.ndll')) && currentModDirectory != "") {
-			return mods(currentModDirectory + '/ndlls/' + key + '.ndll');
-		}
-		else if (FileSystem.exists(getPreloadPath('/ndlls/' + key + '.ndll'))) {
-			return getPreloadPath('/ndlls/' + key + '.ndll');
-		}
-			
-		return 'mods/ndlls/' + key + '.lua';
+		return getPath('ndlls/$key', TEXT, library);
 	}
 	static public function lua(key:String, ?library:String) {
-		if (FileSystem.exists(mods(currentModDirectory + '/' + key + '.lua')) && currentModDirectory != "") {
-			return mods(currentModDirectory + '/' + key + '.lua');
-		}
-		else if (FileSystem.exists(getPreloadPath(key + '.lua'))) {
-			return getPreloadPath(key + '.lua');
-		}
-			
-		return 'mods/' + key + '.lua';
+		return getPath('$key.lua', TEXT, library);
 	}
-	static public function hscript(key:String) {
-		if (FileSystem.exists(mods(currentModDirectory + '/' + key + '.hx')) && currentModDirectory != "") {
-			return mods(currentModDirectory + '/' + key + '.hx');
-		}
-		else if (FileSystem.exists(getPreloadPath(key + '.hx'))) {
-			return getPreloadPath(key + '.hx');
-		}
-			
-		return 'mods/' + key + '.hx';
+	static public function hscript(key:String, ?library:String) {
+		return getPath('$key.hx', TEXT, library);
 	}
 
 	static public function video(key:String) {

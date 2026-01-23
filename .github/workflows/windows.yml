@@ -43,15 +43,17 @@ jobs:
             cache-build-windows
       - name: Install Haxelib
         run: |
-          haxelib install flixel 5.5.0 --skip-dependencies --never
-          haxelib install flixel-addons 3.2.0 --skip-dependencies --never
-          haxelib install flixel-ui 2.6.0 --skip-dependencies --never
+          haxelib install flixel 5.5.0 --skip-dependencies
+          haxelib install flixel-addons 3.2.0 --skip-dependencies
+          haxelib install flixel-ui 2.6.0 --skip-dependencies
           haxelib git hscript https://github.com/CodenameCrew/hscript-improved
-          haxelib install hxCodec 2.5.1 --skip-dependencies --never
-          haxelib install hxcpp 4.2.1 --skip-dependencies --never
+          haxelib install hxCodec 2.5.1 --skip-dependencies
+          haxelib install hxcpp 4.2.1 --skip-dependencies
           haxelib install hxdiscord_rpc 1.3.0
-          haxelib install lime 8.1.3 --skip-dependencies --never
-          haxelib install openfl 9.4.2 --skip-dependencies --never
+          haxelib install lime 8.1.3 --skip-dependencies
+          haxelib install openfl 9.4.2 --skip-dependencies
+          haxelib install haxeui-core --skip-dependencies
+          haxelib install haxeui-flixel --skip-dependencies
           haxelib git linc_luajit https://github.com/superpowers04/linc_luajit
         shell: cmd
       - name: Create Version Tag

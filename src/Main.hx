@@ -56,6 +56,8 @@ class Main extends Sprite {
 		var stageWidth:Int = Lib.current.stage.stageWidth;
 		var stageHeight:Int = Lib.current.stage.stageHeight;
 
+		haxe.ui.Toolkit.init();
+
 		#if hxdiscord_rpc DiscordClient.prepare(); #end
 
 		funkin.jit.script.HScript.loadMappings();
