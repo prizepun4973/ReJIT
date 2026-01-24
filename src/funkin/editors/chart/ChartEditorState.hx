@@ -19,6 +19,8 @@ import funkin.game.component.Note.EventNote;
 import funkin.game.data.StageData;
 import funkin.game.data.Section.SwagSection;
 
+import haxe.ui.core.Component;
+
 import haxe.Json;
 
 import openfl.display.BlendMode;
@@ -140,7 +142,7 @@ abstract class EditorAction {
     public function undo() {}
 }
 
-class ChartEditorState extends funkin.editors.ui.EditorState {
+class ChartEditorState extends haxe.ui.backend.flixel.UIState {
     public static var GRID_SIZE:Int = 40;
     public static var Y_OFFSET:Int = 360;
     public static var INSTANCE:ChartEditorState;
@@ -177,6 +179,7 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
     private var conductorLine:FlxSprite;
     private var sectionStartLine:FlxSprite;
     private var sectionStopLine:FlxSprite;
+    public var hudGroup:FlxTypedGroup<FlxSprite> = new FlxTypedGroup();
 
     private var textPanel:FlxText;
     public var crosshair:Crosshair;
@@ -662,45 +665,47 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
         textPanel.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
         hudGroup.add(textPanel);
 
-        tab = new funkin.editors.ui.EditorState.Tabs(this, 
-            ['File', 'Edit', 'Help'], [
+        // tab = new funkin.editors.ui.EditorState.Tabs(this, 
+        //     ['File', 'Edit', 'Help'], [
 
-            ['Edit Chart Data', 'Save', 'Save Event', 'Save As', 'Save Event As', 'Reload Audio', 'Reload Chart', 'Load Events', 'Exit'], 
-            ['Go To', 'Swap', 'Duet', 'Mirror', 'Clear Section', 'Clear Notes', 'Clear Events'],
-            ['Instructions']
-        ]);
+        //     ['Edit Chart Data', 'Save', 'Save Event', 'Save As', 'Save Event As', 'Reload Audio', 'Reload Chart', 'Load Events', 'Exit'], 
+        //     ['Go To', 'Swap', 'Duet', 'Mirror', 'Clear Section', 'Clear Notes', 'Clear Events'],
+        //     ['Instructions']
+        // ]);
 
-        tab.onClick = function (column:Int, line:Int) {
-            switch (column) {
-                case 0:
-                    switch (line) {
-                        case 0: // Edit Chart Data
-                        case 1: // Save
-                        case 2: // Save Event
-                        case 3: // Save As
-                            if(_song.events != null && _song.events.length > 1) _song.events.sort(CoolUtil.sortByTime);
+        // tab.onClick = function (column:Int, line:Int) {
+        //     switch (column) {
+        //         case 0:
+        //             switch (line) {
+        //                 case 0: // Edit Chart Data
+        //                 case 1: // Save
+        //                 case 2: // Save Event
+        //                 case 3: // Save As
+        //                     if(_song.events != null && _song.events.length > 1) _song.events.sort(CoolUtil.sortByTime);
 
-                            var data:String = Json.stringify({"song": _song}, "\t");
-                            _file = new FileReference();
-                            _file.addEventListener(Event.COMPLETE, onSaveComplete);
-                            _file.addEventListener(Event.CANCEL, onSaveCancel);
-                            _file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-                            _file.save(data, '${Paths.formatToSongPath(_song.song)}.json');
-                        case 4: // Save Event As
-                            if(_song.events != null && _song.events.length > 1) _song.events.sort(CoolUtil.sortByTime);
+        //                     var data:String = Json.stringify({"song": _song}, "\t");
+        //                     _file = new FileReference();
+        //                     _file.addEventListener(Event.COMPLETE, onSaveComplete);
+        //                     _file.addEventListener(Event.CANCEL, onSaveCancel);
+        //                     _file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+        //                     _file.save(data, '${Paths.formatToSongPath(_song.song)}.json');
+        //                 case 4: // Save Event As
+        //                     if(_song.events != null && _song.events.length > 1) _song.events.sort(CoolUtil.sortByTime);
 
-                                var data:String = Json.stringify({"song": { events: _song.events }}, "\t");
+        //                         var data:String = Json.stringify({"song": { events: _song.events }}, "\t");
 
-                                if ((data != null) && (data.length > 0)) {
-                                    _file = new FileReference();
-                                    _file.addEventListener(Event.COMPLETE, onSaveComplete);
-                                    _file.addEventListener(Event.CANCEL, onSaveCancel);
-                                    _file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-                                    _file.save(data.trim(), "events.json");
-                                }
-                            }
-            }
-        };
+        //                         if ((data != null) && (data.length > 0)) {
+        //                             _file = new FileReference();
+        //                             _file.addEventListener(Event.COMPLETE, onSaveComplete);
+        //                             _file.addEventListener(Event.CANCEL, onSaveCancel);
+        //                             _file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+        //                             _file.save(data.trim(), "events.json");
+        //                         }
+        //                     }
+        //     }
+        // };
+
+        // addComponent(haxe.ui.ComponentBuilder.build("art/ui/chart-editor/main-view.xml"));
 
         updateCurSec();
 

@@ -123,6 +123,7 @@ class Paths {
 
 	public static function getPath(file:String, ?type:AssetType = AssetType.BINARY, ?library:Null<String> = null) {
 		if (library != null) return getLibraryPath(file, library);
+		if (FileSystem.exists(modFolders(file))) return modFolders(file);
 		return getPreloadPath(file);
 	}
 
