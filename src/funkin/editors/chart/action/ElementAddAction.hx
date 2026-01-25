@@ -32,7 +32,7 @@ class ElementAddAction extends ChartEditorState.EditorAction {
                     note.dataID = i;
                     editor.addElement(note);
                 } else {
-                    var event:GuiEventNote = new GuiEventNote(false, data.get('strumTime'), []);
+                    var event:GuiEventNote = new GuiEventNote(false, data.get('strumTime'), data.get('events'));
                     event.events = data.get('events');
                     event.dataID = i;
                     editor.addElement(event);

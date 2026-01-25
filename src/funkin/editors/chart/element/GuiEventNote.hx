@@ -5,9 +5,9 @@ import funkin.editors.chart.ChartEditorState.GuiElement;
 import funkin.game.component.Note.EventNote;
 
 class GuiEventNote extends GuiElement {
-    public var events:Array<EventNote>;
+    public var events:Array<Array<String>>;
 
-    public function new(pushData:Bool, strumTime:Float, events:Array<EventNote>) {
+    public function new(pushData:Bool, strumTime:Float, events:Array<Array<String>>) {
         super(strumTime);
 
         this.events = events;
@@ -20,14 +20,18 @@ class GuiEventNote extends GuiElement {
 
             this.dataID = ChartEditorState.data.length - 1;
         }
+        
+        // loadGraphic(Paths.image("eventArrow"));
+        // setGraphicSize(ChartEditorState.GRID_SIZE, ChartEditorState.GRID_SIZE);
+        // centerOffsets();
+        // centerOrigin();
 
-        loadGraphic(Paths.image("eventArrow"));
-        setGraphicSize(ChartEditorState.GRID_SIZE, ChartEditorState.GRID_SIZE);
-        centerOffsets();
-        centerOrigin();
+        // offset.x -= ChartEditorState.GRID_SIZE / 2 - 5;
+        // offset.y -= ChartEditorState.GRID_SIZE / 2 - 5;
 
-        offset.x -= ChartEditorState.GRID_SIZE / 2 - 5;
-        offset.y -= ChartEditorState.GRID_SIZE / 2 - 5;
+        makeGraphic(ChartEditorState.GRID_SIZE, 4);
+        offset.x -= ChartEditorState.GRID_SIZE * 1.5 - 2;
+        offset.y -= ChartEditorState.GRID_SIZE * 1.5 - 2;
 
         updatePos();
     }
@@ -35,6 +39,7 @@ class GuiEventNote extends GuiElement {
     override function updatePos() {
         x = ChartEditorState.INSTANCE.nextGridBG.x - ChartEditorState.GRID_SIZE * 2.5 + 2;
         y = (ChartEditorState.Y_OFFSET - ChartEditorState.GRID_SIZE * 1.5 + 2) - ((Conductor.songPosition - ChartEditorState.calcY(strumTime)) * ChartEditorState.GRID_SIZE / Conductor.crochet * 4);
+
         alpha = strumTime < Conductor.songPosition ? 0.6 : 1;
     }
 }

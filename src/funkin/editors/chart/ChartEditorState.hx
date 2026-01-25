@@ -375,6 +375,23 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
             trace(redos);
         }
 
+        if (FlxG.keys.pressed.CONTROL && FlxG.keys.pressed.ALT && FlxG.keys.justPressed.S) {
+            if(_song.events != null && _song.events.length > 1) _song.events.sort(CoolUtil.sortByTime);
+            var json = {
+                "song": _song
+            };
+
+            var data:String = Json.stringify(json, "\t");
+
+            if ((data != null) && (data.length > 0)) {
+                _file = new FileReference();
+                _file.addEventListener(Event.COMPLETE, onSaveComplete);
+                _file.addEventListener(Event.CANCEL, onSaveCancel);
+                _file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+                _file.save(data.trim(), Paths.formatToSongPath(_song.song) + ".json");
+            }
+        }
+
         // wip
         if (FlxG.keys.anyJustPressed(ClientPrefs.copyKey(ClientPrefs.keyBinds.get('debug_1')))) {
             funkin.component.MusicBeatState.switchState(new funkin.editors.ChartingState());
@@ -425,7 +442,7 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
                 else addAction(new ElementAddAction([new GuiEventNote(
                         true, 
                         crosshair.chained? crosshair.chainedMousePos : getMousePos(), 
-                        [])])
+                        [['Add Camera Zoom', '', '']])])
                     );
                     
             }
