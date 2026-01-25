@@ -45,123 +45,20 @@ import funkin.editors.ui.*;
 
 using StringTools;
 
-class SelectIndicator extends FlxSprite {
-    public var target:GuiElement;
-
-    public function new(target:GuiElement) {
-        super(0, 0);
-
-        this.target = target;
-
-        makeGraphic(ChartEditorState.GRID_SIZE, ChartEditorState.GRID_SIZE, 0xff00FFFF);
-
-        updatePos();
-    }
-
-    override function update(elapsed:Float) {
-        super.update(elapsed);
-        updatePos();
-    }
-
-    function updatePos() {
-        x = target.x + ChartEditorState.GRID_SIZE * 1.5 - 2;
-        y = target.y + ChartEditorState.GRID_SIZE * 1.5;
-    }
-}
-
-class Crosshair extends FlxSprite {
-    public var target:GuiElement;
-    public var chained:Bool = true;
-    public var chainedMousePos:Float;
-
-    public function new() {
-        super(0, 0);
-        makeGraphic(ChartEditorState.GRID_SIZE, ChartEditorState.GRID_SIZE, 0xffBD99FF);
-        alpha = 0.5;
-    }
-
-    override function update(elapsed:Float) {
-        super.update(elapsed);
-        var editor:ChartEditorState = ChartEditorState.INSTANCE;
-
-        var mouseStrumTime:Float = ChartEditorState.getMousePos();
-        var GRID_SIZE = ChartEditorState.GRID_SIZE;
-
-        chainedMousePos = Conductor.getBPMFromSeconds(mouseStrumTime).songTime + Math.floor((mouseStrumTime - Conductor.getBPMFromSeconds(mouseStrumTime).songTime) / Conductor.getCrochetAtTime(mouseStrumTime) / 4 * editor.beatSnap) * Conductor.getCrochetAtTime(mouseStrumTime) * 4 / editor.beatSnap;
-        x = editor.gridBG.x + Math.floor((FlxG.mouse.x - editor.gridBG.x) / GRID_SIZE) * GRID_SIZE;
-        y = chained? ChartEditorState.Y_OFFSET - (Conductor.songPosition - ChartEditorState.calcY(chainedMousePos)) * GRID_SIZE / Conductor.crochet * 4
-         : FlxG.mouse.y - height / 2;
-        visible = FlxG.mouse.x >= editor.gridBG.x && FlxG.mouse.x < editor.gridBG.x + editor.gridBG.width
-            && mouseStrumTime >= 0 && mouseStrumTime <= FlxG.sound.music.length && FlxG.mouse.y > 100;
-
-        var anyHovered = false;
-        editor.renderNotes.forEachAlive(function (sprite:FlxSprite) {
-            if (Std.isOfType(sprite, GuiElement)) {
-                var hitboxScale = 16 / editor.beatSnap * ChartEditorState.GRID_SIZE;
-                var element:GuiElement = cast (sprite, GuiElement);
-                var x1:Float = element.x + GRID_SIZE * 1.5 - 2;
-                var y1:Float = element.y + GRID_SIZE * 1.5;
-                var x2:Float = x1 + GRID_SIZE;
-                var y2:Float = y1 + hitboxScale;
-
-                if (FlxG.mouse.x >= x1 && FlxG.mouse.x <= x2 && FlxG.mouse.y >= y1 && FlxG.mouse.y <= y2 && !anyHovered) {
-                    target = element;
-                    anyHovered = true;
-                }
-                else if (!anyHovered) target = null;
-            }
-            else if (!anyHovered) target = null;
-        });
-    }
-}
-
-class GuiElement extends FlxSprite {
-    public var strumTime:Float = 0;
-    public var dataID:Int;
-    public var editor:ChartEditorState = ChartEditorState.INSTANCE;
-
-    public function new(strumTime:Float) {
-        super(0, 0);
-        this.strumTime = strumTime;
-    }
-
-    override function update(elapsed:Float) {
-        ChartEditorState.INSTANCE.updateCurSec();
-        updatePos();
-        super.update(elapsed);
-    }
-
-    function updatePos() {}
-}
-
-abstract class EditorAction {
-    public var editor:ChartEditorState = ChartEditorState.INSTANCE;
-    public var dataID:Int;
-    public function new() {}
-    public function redo() {}
-    public function undo() {}
-}
-
 class ChartEditorState extends funkin.editors.ui.EditorState {
     public static var GRID_SIZE:Int = 40;
     public static var Y_OFFSET:Int = 360;
     public static var INSTANCE:ChartEditorState;
-
-    public static var lastPos:Float = 0;
-    public static var curSec:Int = 0;
-    public static var lastUpdateTime:Float;
-    public static var nextUpdateTime:Float;
     
-    public var paused:Bool = true;
     public static var undos:Array<EditorAction> = [];
     public static var redos:Array<EditorAction> = [];
-
     public static var data:Array<Map<String, Dynamic>> = [];
 
+    public var paused:Bool = true;
     public var beatSnap:Int = 32;
 
     // data
-    public var _song:SwagSong;
+    public static var _song:SwagSong;
     private var sectionBPM:Array<Float> = [];
 
     var _file:FileReference;
@@ -170,19 +67,32 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
     private var vocals:FlxSound = null;
 
     // graphics
+    public static var bottomHeight:Int = 20;
+
+    public static var lastPos:Float = 0;
+    public static var curSec:Int = 0;
+    public static var lastUpdateTime:Float;
+    public static var nextUpdateTime:Float;
+
     public var renderNotes:FlxTypedGroup<FlxSprite> = new FlxTypedGroup();
+    private var gridGroup:FlxTypedGroup<FlxSprite> = new FlxTypedGroup();
+    public var selectIndicator:FlxTypedGroup<SelectIndicator> = new FlxTypedGroup();
+
     public var gridBG:FlxSprite;
     public var nextGridBG:FlxSprite;
-    private var gridGroup:FlxTypedGroup<FlxSprite> = new FlxTypedGroup();
     private var eventSplitLine:FlxSprite;
     private var sideSplitLine:FlxSprite;
     private var conductorLine:FlxSprite;
     private var sectionStartLine:FlxSprite;
     private var sectionStopLine:FlxSprite;
+    public var crosshair:Crosshair;
 
     private var textPanel:FlxText;
-    public var crosshair:Crosshair;
-    public var selectIndicator:FlxTypedGroup<SelectIndicator> = new FlxTypedGroup();
+
+    private var songPos(get, never):Float;
+    function get_songPos():Float {
+        return Conductor.songPosition;
+    }
     
     public static function reset() {
         lastPos = 0;
@@ -192,6 +102,15 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
         undos = [];
         redos = [];
         data = [];
+    }
+
+    public static function canInput() {
+        return 
+            FlxG.mouse.y > 32 && 
+            FlxG.mouse.y < FlxG.height - bottomHeight && 
+            haxe.ui.focus.FocusManager.instance.focus == null && 
+            !haxe.ui.core.Screen.instance.hasSolidComponentUnderPoint(FlxG.mouse.x, FlxG.mouse.y)
+        ;
     }
     
     public static function getMousePos() {
@@ -250,7 +169,7 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
     }
 
     function pause() {
-        if (paused) { // resume
+        if (paused && Conductor.songPosition < FlxG.sound.music.length) { // resume
             FlxG.sound.music.time = Conductor.songPosition;
             if (vocals != null) {
                 vocals.time = FlxG.sound.music.time;
@@ -326,9 +245,7 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
     function saveChanges() {
         _song.events = new Array();
 
-        for (section in _song.notes) {
-            section.sectionNotes = new Array<Dynamic>();
-        }
+        for (section in _song.notes) section.sectionNotes = new Array<Dynamic>();
 
         renderNotes.forEachAlive(function (i:FlxSprite) {
             if (Std.isOfType(i, GuiNote)) {
@@ -377,8 +294,7 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
     /**
 	 * Called when the save file dialog is cancelled.
 	 */
-	function onSaveCancel(_):Void
-	{
+	function onSaveCancel(_):Void {
 		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
 		_file.removeEventListener(Event.CANCEL, onSaveCancel);
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
@@ -388,8 +304,7 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
 	/**
 	 * Called if there is an error while saving the gameplay recording.
 	 */
-	function onSaveError(_):Void
-	{
+	function onSaveError(_):Void {
 		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
 		_file.removeEventListener(Event.CANCEL, onSaveCancel);
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
@@ -406,39 +321,8 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
         super.destroy();
         lastPos = Conductor.songPosition;
     }
-    
-    override function update(elapsed:Float) {
-        super.update(elapsed);
-        call("onUpdate", [elapsed]);
-        var songPos:Float = Conductor.songPosition;
 
-        /*
-            System
-        */
-        if (Conductor.songPosition < 0) Conductor.songPosition = 0;
-        if (Conductor.songPosition >= FlxG.sound.music.length) Conductor.songPosition = FlxG.sound.music.length;
-        if (!paused) Conductor.songPosition = FlxG.sound.music.time;
-
-        if (renderNotes.members.length <= 0) updateCurSec();
-
-        /*
-            handle graphic
-        */
-        nextGridBG.y = Y_OFFSET - (songPos - lastUpdateTime + Conductor.crochet * 2) * GRID_SIZE / Conductor.crochet * 4 - GRID_SIZE * 5;
-        gridBG.y = Y_OFFSET - (songPos - lastUpdateTime) * GRID_SIZE / Conductor.crochet * 4;
-        sectionStartLine.y = gridBG.y;
-        sectionStopLine.y = Y_OFFSET - (songPos - nextUpdateTime) * GRID_SIZE / Conductor.crochet * 4;
-
-        textPanel.text = 
-            FlxStringUtil.formatTime(Conductor.songPosition / 1000, true) + " / " + FlxStringUtil.formatTime(FlxG.sound.music.length / 1000, true) + " (" + Std.string(FlxMath.roundDecimal(Conductor.songPosition / 1000, 2)) + ")" +
-		    "\nBeat: " + curBeat + " | Step: " + curStep + 
-            "\nSection: " + curSec + " (Beats: " + _song.notes[curSec].sectionBeats + ", BPM: " + sectionBPM[curSec] + ")";
-
-        /*
-            handle inputs
-        */
-        actionListener();
-
+    function handleKeybinds() {
         if (FlxG.keys.justPressed.ENTER) {
             if (!paused) pause();
             saveChanges();
@@ -497,15 +381,44 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
         }
     }
 
+    function handleGraphic() {
+        nextGridBG.y = Y_OFFSET - (songPos - lastUpdateTime + Conductor.crochet * 2) * GRID_SIZE / Conductor.crochet * 4 - GRID_SIZE * 5;
+        gridBG.y = Y_OFFSET - (songPos - lastUpdateTime) * GRID_SIZE / Conductor.crochet * 4;
+        sectionStartLine.y = gridBG.y - sectionStartLine.height / 2;
+        sectionStopLine.y = Y_OFFSET - (songPos - nextUpdateTime) * GRID_SIZE / Conductor.crochet * 4 - sectionStopLine.height / 2;
+
+        textPanel.text = 
+            FlxStringUtil.formatTime(Conductor.songPosition / 1000, true) + " / " + FlxStringUtil.formatTime(FlxG.sound.music.length / 1000, true) +
+            "                          Section: " + curSec + " (Beats: " + _song.notes[curSec].sectionBeats + ", BPM: " + sectionBPM[curSec] + ")" + 
+		    " Beat: " + curBeat + " | Step: " + curStep + 
+            " (" + Std.string(FlxMath.roundDecimal(Conductor.songPosition / 1000, 2)) + ")";
+    }
+    
+    override function update(elapsed:Float) {
+        super.update(elapsed);
+        call("onUpdate", [elapsed]);
+
+        if (Conductor.songPosition < 0) Conductor.songPosition = 0;
+        if (Conductor.songPosition >= FlxG.sound.music.length) Conductor.songPosition = FlxG.sound.music.length;
+        if (!paused) Conductor.songPosition = FlxG.sound.music.time;
+        if (renderNotes.members.length <= 0) updateCurSec();
+        
+        handleGraphic();
+        if (canInput()) {
+            handleKeybinds();
+            actionListener();
+        }
+    }
+
     function actionListener() {
         if (crosshair.visible) {
             if (FlxG.mouse.pressed && !FlxG.keys.pressed.CONTROL && !FlxG.keys.pressed.SHIFT && crosshair.target == null && paused) {
-                if (FlxG.mouse.x > gridBG.x + GRID_SIZE) {
+                if (FlxG.mouse.x > gridBG.x) {
                     addAction(new ElementAddAction([
                         new GuiNote(
                             true, 
                             crosshair.chained? crosshair.chainedMousePos : getMousePos(), 
-                            Math.floor((FlxG.mouse.x - gridBG.x - GRID_SIZE) / GRID_SIZE),
+                            Math.floor((FlxG.mouse.x - gridBG.x) / GRID_SIZE),
                             0
                     )]));
                 }
@@ -517,9 +430,7 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
                     
             }
 
-            if (FlxG.mouse.pressedRight && !FlxG.keys.pressed.CONTROL && crosshair.target != null && !FlxG.keys.pressed.SHIFT && paused) {
-                addAction(new ElementRemoveAction([crosshair.target]));
-            }
+            if (FlxG.mouse.pressedRight && !FlxG.keys.pressed.CONTROL && crosshair.target != null && !FlxG.keys.pressed.SHIFT && paused) addAction(new ElementRemoveAction([crosshair.target]));
         }
     }
 
@@ -585,6 +496,7 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
                 vocals.play();
                 vocals.pause();
 			}
+
             curSec = -1;
 		};
 
@@ -598,23 +510,20 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
 
         add(gridGroup);
 
-        nextGridBG = FlxGridOverlay.create(GRID_SIZE, GRID_SIZE, GRID_SIZE * 9, GRID_SIZE * 50);
+        nextGridBG = FlxGridOverlay.create(GRID_SIZE, GRID_SIZE, GRID_SIZE * 8, GRID_SIZE * 50);
         nextGridBG.alpha = 0.8;
         nextGridBG.screenCenter(X);
         nextGridBG.x -= GRID_SIZE / 2;
         nextGridBG.y = Y_OFFSET;
         gridGroup.add(nextGridBG);
 
-        gridBG = new FlxSprite().makeGraphic(GRID_SIZE * 9, GRID_SIZE * 16, FlxColor.WHITE);
+        gridBG = new FlxSprite().makeGraphic(GRID_SIZE * 8, GRID_SIZE * 16, FlxColor.WHITE);
         gridBG.screenCenter(X);
         gridBG.alpha = 0.3;
         gridBG.x -= GRID_SIZE / 2;
         gridGroup.add(gridBG);
 
-        sideSplitLine = new FlxSprite(nextGridBG.x + GRID_SIZE * 5, 0).makeGraphic(2, Std.int(nextGridBG.height), FlxColor.BLACK);
-        gridGroup.add(sideSplitLine);
-        eventSplitLine = new FlxSprite(nextGridBG.x + GRID_SIZE, 0).makeGraphic(2, Std.int(nextGridBG.height), FlxColor.BLACK);
-        gridGroup.add(eventSplitLine);
+        gridGroup.add(new FlxSprite(nextGridBG.x + GRID_SIZE * 4 - 1, 0).makeGraphic(2, Std.int(nextGridBG.height), FlxColor.BLACK));
 
         add(selectIndicator);
         add(renderNotes);
@@ -638,21 +547,17 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
             nextUpdateTime = _song.notes[curSec].sectionBeats * Conductor.crochet;
         }
 
-        var wip:FlxText = new FlxText(2, FlxG.height - 28, 400, "chart editor is wip, plz press debugkey1", 12);
-        wip.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, FlxTextAlign.LEFT);
-        hudGroup.add(wip);
-
-        sectionStartLine = new FlxSprite(0, Y_OFFSET).makeGraphic(GRID_SIZE * 13, 4, FlxColor.WHITE);
+        sectionStartLine = new FlxSprite(0, Y_OFFSET).makeGraphic(GRID_SIZE * 8, 2, FlxColor.GREEN);
         sectionStartLine.screenCenter(X);
         sectionStartLine.x -= GRID_SIZE / 2;
         hudGroup.add(sectionStartLine);
 
-        sectionStopLine = new FlxSprite(0, Y_OFFSET).makeGraphic(GRID_SIZE * 13, 4, FlxColor.WHITE);
+        sectionStopLine = new FlxSprite(0, Y_OFFSET).makeGraphic(GRID_SIZE * 8, 2, FlxColor.GREEN);
         sectionStopLine.screenCenter(X);
         sectionStopLine.x -= GRID_SIZE / 2;
         hudGroup.add(sectionStopLine);
 
-        conductorLine = new FlxSprite(0, Y_OFFSET).makeGraphic(GRID_SIZE * 13, 4, 0xffBD99FF);
+        conductorLine = new FlxSprite(0, Y_OFFSET).makeGraphic(GRID_SIZE * 10, 4, FlxColor.WHITE);
         conductorLine.screenCenter(X);
         conductorLine.x -= GRID_SIZE / 2;
         hudGroup.add(conductorLine);
@@ -660,14 +565,120 @@ class ChartEditorState extends funkin.editors.ui.EditorState {
         crosshair = new Crosshair();
         hudGroup.add(crosshair);
         
-        textPanel = new FlxText(5, 45, 400, "hi", 12);
+        hudGroup.add(haxe.ui.ComponentBuilder.fromFile('art/ui/chart-editor/main-view.xml'));
+        
+        var bottomHeight:Int = 20;
+        hudGroup.add(new FlxSprite(0, FlxG.height - bottomHeight).makeGraphic(FlxG.width, bottomHeight, 0xFF3D3F41));
+        
+        textPanel = new FlxText(2, FlxG.height - bottomHeight + 1, 0, "hi", 12);
         textPanel.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+        textPanel.wordWrap = false;
+        textPanel.autoSize = true;
         hudGroup.add(textPanel);
-
-        add(haxe.ui.ComponentBuilder.fromFile('art/ui/chart-editor/main-view.xml'));
 
         updateCurSec();
 
         call('postCreate', []);
     }
+}
+
+class SelectIndicator extends FlxSprite {
+    public var target:GuiElement;
+
+    public function new(target:GuiElement) {
+        super(0, 0);
+
+        this.target = target;
+
+        makeGraphic(ChartEditorState.GRID_SIZE, ChartEditorState.GRID_SIZE, 0xff00FFFF);
+
+        updatePos();
+    }
+
+    override function update(elapsed:Float) {
+        super.update(elapsed);
+        updatePos();
+    }
+
+    function updatePos() {
+        x = target.x + ChartEditorState.GRID_SIZE * 1.5 - 2;
+        y = target.y + ChartEditorState.GRID_SIZE * 1.5;
+    }
+}
+
+class Crosshair extends FlxSprite {
+    public var target:GuiElement;
+    public var chained:Bool = true;
+    public var chainedMousePos:Float;
+
+    public function new() {
+        super(0, 0);
+        makeGraphic(ChartEditorState.GRID_SIZE, ChartEditorState.GRID_SIZE, 0xffBD99FF);
+        alpha = 0.5;
+    }
+
+    override function update(elapsed:Float) {
+        super.update(elapsed);
+        var editor:ChartEditorState = ChartEditorState.INSTANCE;
+
+        var mouseStrumTime:Float = ChartEditorState.getMousePos();
+        var GRID_SIZE = ChartEditorState.GRID_SIZE;
+
+        chainedMousePos = Conductor.getBPMFromSeconds(mouseStrumTime).songTime + Math.floor((mouseStrumTime - Conductor.getBPMFromSeconds(mouseStrumTime).songTime) / Conductor.getCrochetAtTime(mouseStrumTime) / 4 * editor.beatSnap) * Conductor.getCrochetAtTime(mouseStrumTime) * 4 / editor.beatSnap;
+        x = editor.gridBG.x + Math.floor((FlxG.mouse.x - editor.gridBG.x) / GRID_SIZE) * GRID_SIZE;
+        y = chained? ChartEditorState.Y_OFFSET - (Conductor.songPosition - ChartEditorState.calcY(chainedMousePos)) * GRID_SIZE / Conductor.crochet * 4
+         : FlxG.mouse.y - height / 2;
+        visible = 
+            FlxG.mouse.x >= editor.gridBG.x - ChartEditorState.GRID_SIZE && 
+            FlxG.mouse.x < editor.gridBG.x + editor.gridBG.width && 
+            mouseStrumTime >= 0 && 
+            mouseStrumTime <= FlxG.sound.music.length && 
+            ChartEditorState.canInput();
+
+        var anyHovered = false;
+        editor.renderNotes.forEachAlive(function (sprite:FlxSprite) {
+            if (Std.isOfType(sprite, GuiElement)) {
+                var hitboxScale = 16 / editor.beatSnap * ChartEditorState.GRID_SIZE;
+                var element:GuiElement = cast (sprite, GuiElement);
+                var x1:Float = element.x + GRID_SIZE * 1.5 - 2;
+                var y1:Float = element.y + GRID_SIZE * 1.5;
+                var x2:Float = x1 + GRID_SIZE;
+                var y2:Float = y1 + hitboxScale;
+
+                if (FlxG.mouse.x >= x1 && FlxG.mouse.x <= x2 && FlxG.mouse.y >= y1 && FlxG.mouse.y <= y2 && !anyHovered) {
+                    target = element;
+                    anyHovered = true;
+                }
+                else if (!anyHovered) target = null;
+            }
+            else if (!anyHovered) target = null;
+        });
+    }
+}
+
+class GuiElement extends FlxSprite {
+    public var strumTime:Float = 0;
+    public var dataID:Int;
+    public var editor:ChartEditorState = ChartEditorState.INSTANCE;
+
+    public function new(strumTime:Float) {
+        super(0, 0);
+        this.strumTime = strumTime;
+    }
+
+    override function update(elapsed:Float) {
+        ChartEditorState.INSTANCE.updateCurSec();
+        updatePos();
+        super.update(elapsed);
+    }
+
+    function updatePos() {}
+}
+
+abstract class EditorAction {
+    public var editor:ChartEditorState = ChartEditorState.INSTANCE;
+    public var dataID:Int;
+    public function new() {}
+    public function redo() {}
+    public function undo() {}
 }

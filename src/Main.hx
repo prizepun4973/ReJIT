@@ -59,8 +59,7 @@ class Main extends Sprite {
 		var stageHeight:Int = Lib.current.stage.stageHeight;
 
 		Toolkit.init();
-    	Toolkit.theme = 'dark'; // don't be cringe
-		// Toolkit.theme = 'light'; // embrace cringe
+    	Toolkit.theme = 'dark';
 		Toolkit.autoScale = false;
 		// Don't focus on UI elements when they first appear.
 		haxe.ui.focus.FocusManager.instance.autoFocus = false;

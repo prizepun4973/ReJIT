@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menubar id="tab" width="100%" paddingLeft="0">
+  <menu text="File">
+      <menuitem text="Edit Chart Data"/>
+      <menuitem text="Save" shortcutText="Ctrl + S" />
+      <menuitem text="Save Event" shortcutText="" />
+      <menuitem text="Save As" shortcutText="" />
+      <menuitem text="Save Event As" shortcutText="" />
+      <menuitem text="Reload Audio" shortcutText="" />
+      <menuitem text="Reload Chart" shortcutText="" />
+      <menuitem text="Load Events" shortcutText="" />
+      <menuitem text="Exit" shortcutText="" />
+  </menu>
+
+  <menu text="Edit">
+      <menuitem text="Go To" shortcutText="Ctrl" />
+      <menuitem text="Swap" shortcutText="Ctrl" />
+      <menuitem text="Duet" shortcutText="Ctrl" />
+      <menuitem text="Mirror" shortcutText="Ctrl" />
+      <menuitem text="Clear Section" shortcutText="Ctrl" />
+      <menuitem text="Clear Notes" shortcutText="Ctrl" />
+      <menuitem text="Clear Events" shortcutText="Ctrl" />
+  </menu>
+
+  <menu text="Help">
+      <menuitem text="Instructions"/>
+  </menu>
+
+  <menu text="Test">
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+      <menuitem text="Item 1" shortcutText="Ctrl" />
+  </menu>
+
+  <spacer width="100%" />
+</menubar>

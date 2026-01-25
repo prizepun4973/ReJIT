@@ -65,7 +65,7 @@ class GuiNote extends GuiElement{
     override function updatePos() {        
         var crochet:Float = (60 / Conductor.getBPMFromSeconds(Conductor.songPosition).bpm) * 1000;
 
-        x =  ChartEditorState.INSTANCE.nextGridBG.x - ChartEditorState.GRID_SIZE * 1.5 + (noteData + 1) * ChartEditorState.GRID_SIZE + 2;
+        x =  ChartEditorState.INSTANCE.nextGridBG.x - ChartEditorState.GRID_SIZE * 2.5 + (noteData + 1) * ChartEditorState.GRID_SIZE + 2;
         y = (ChartEditorState.Y_OFFSET - ChartEditorState.GRID_SIZE * 1.5) - ((Conductor.songPosition - ChartEditorState.calcY(strumTime)) / crochet * 4 * ChartEditorState.GRID_SIZE);
         alpha = strumTime < Conductor.songPosition ? 0.6 : 1;
 
