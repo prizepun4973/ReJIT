@@ -1667,7 +1667,7 @@ class PlayState extends MusicBeatState {
 		}*/
 
 		if (ClientPrefs.gcTime > 0)
-			if (Math.floor(Conductor.songPosition) % ClientPrefs.gcTime == 0) Paths.clearUnusedMemory();
+			if (Math.floor(Conductor.songPosition / 1000) % ClientPrefs.gcTime == 0) Paths.clearUnusedMemory();
 
 		callOnLuas('onUpdate', [elapsed]);
 		callHScript('update', [elapsed]);
