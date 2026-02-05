@@ -54,8 +54,10 @@ class ChartEditorState extends UIState {
     public static var redos:Array<EditorAction> = [];
     public static var data:Array<Map<String, Dynamic>> = [];
 
+    public static var clipBoard:Array<Int> = [];
+
     public var paused:Bool = true;
-    public static var beatSnap:Int = 32;
+    public static var beatSnap:Int;
 
     // data
     public static var _song:SwagSong;
@@ -69,8 +71,8 @@ class ChartEditorState extends UIState {
     // graphics
     public static var bottomHeight:Int = 20;
 
-    public static var lastPos:Float = 0;
-    public static var curSec:Int = 0;
+    public static var lastPos:Float;
+    public static var curSec:Int;
     public static var lastUpdateTime:Float;
     public static var nextUpdateTime:Float;
 
@@ -114,22 +116,6 @@ class ChartEditorState extends UIState {
             FlxG.mouse.y < FlxG.height - bottomHeight && 
             !tab.isFocused()
         ;
-    }
-    
-    public static function getMousePos() {
-        var strumTime:Float = Conductor.songPosition + (FlxG.mouse.y - Y_OFFSET) / (GRID_SIZE / Conductor.crochet * 4);
-        var map:BPMChangeEvent;
-        var crochet:Float;
-        if (Conductor.songPosition <= strumTime) {
-            map = Conductor.getBPMFromSeconds(strumTime);
-            crochet = (60 / map.bpm) * 1000;
-        }
-        else {
-            map = Conductor.getBPMFromSeconds(Conductor.songPosition);
-            crochet = (60 / Conductor.getBPMFromSeconds(strumTime).bpm) * 1000;
-        }
-        
-        return map.songTime + ((strumTime - map.songTime) * crochet / Conductor.crochet);
     }
 
     public static function calcY(strumTime:Float = 0) {
@@ -352,16 +338,6 @@ class ChartEditorState extends UIState {
             }
         }
 
-        if (FlxG.keys.pressed.DELETE) {
-            var toDelete:Array<GuiElement> = new Array();
-
-            selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
-                toDelete.push(indicator.target); 
-            });
-
-            if (toDelete.length > 0) addAction(new ElementRemoveAction(toDelete));
-        }
-
         // undo / redo
         if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.Z && undos.length > 0) {
             undos[undos.length - 1].undo();
@@ -452,17 +428,84 @@ class ChartEditorState extends UIState {
                     addAction(new ElementAddAction([
                         new GuiNote(
                             true, 
-                            crosshair.chained? crosshair.chainedMousePos : getMousePos(), 
+                            crosshair.chained? crosshair.chainedMousePos : crosshair.getMousePos(), 
                             Math.floor((FlxG.mouse.x - gridBG.x) / GRID_SIZE),
                             0
                     )]));
                 }
                 else addAction(new ElementAddAction([new GuiEventNote(
                         true, 
-                        crosshair.chained? crosshair.chainedMousePos : getMousePos(), 
+                        crosshair.chained? crosshair.chainedMousePos : crosshair.getMousePos(), 
                         [['Add Camera Zoom', '', '']])])
                     );
                     
+            }
+
+            if (FlxG.keys.justPressed.DELETE) {
+                var toDelete:Array<GuiElement> = new Array();
+
+                selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
+                    toDelete.push(indicator.target); 
+                });
+
+                if (toDelete.length > 0) addAction(new ElementRemoveAction(toDelete));
+            }
+
+            if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.X) {
+                var toDelete:Array<GuiElement> = new Array();
+                
+                clipBoard = [];
+
+                selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
+                    toDelete.push(indicator.target);
+                    clipBoard.push(indicator.target.dataID);
+                });
+
+                if (toDelete.length > 0) addAction(new ElementRemoveAction(toDelete));
+            }
+
+            if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.C) {
+                
+                clipBoard = [];
+
+                selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
+                    clipBoard.push(indicator.target.dataID);
+                });
+            }
+
+            if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.V) {
+                var toAdd:Array<GuiElement> = new Array();
+                
+                var firstStrumTime:Float = data[0].get('strumTime');
+                for (i in clipBoard) {
+                    if (firstStrumTime > data[i].get('strumTime')) firstStrumTime = data[i].get('strumTime');
+                }
+                trace(firstStrumTime);
+
+                var change:Float = crosshair.getMousePos() - firstStrumTime;
+                for (i in clipBoard) {
+                    var elementData = data[i];
+
+                    var anchor:Float = elementData.get('strumTime') + change;
+                    // trace(anchor);
+                    if (anchor >= 0) {
+                        if (elementData.get('events') == null) {
+                            toAdd.push(new GuiNote(
+                                true,
+                                anchor,
+                                elementData.get('noteData'),
+                                elementData.get('noteType')
+                            ));
+                        } else {
+                            toAdd.push(new GuiEventNote(
+                                true,
+                                anchor,
+                                elementData.get('events')
+                            ));
+                        }
+                    }
+                    addAction(new ElementAddAction(toAdd));
+                }
             }
 
             if (FlxG.mouse.pressedRight && !FlxG.keys.pressed.CONTROL && crosshair.target != null && !FlxG.keys.pressed.SHIFT && paused) addAction(new ElementRemoveAction([crosshair.target]));
@@ -695,17 +738,40 @@ class Crosshair extends FlxSprite {
         alpha = 0.5;
     }
 
+    public static function getRawMousePos() {
+        var strumTime:Float = Conductor.songPosition + (FlxG.mouse.y - ChartEditorState.Y_OFFSET) / (ChartEditorState.GRID_SIZE / Conductor.crochet * 4);
+        var map:BPMChangeEvent;
+        var crochet:Float;
+        if (Conductor.songPosition <= strumTime) {
+            map = Conductor.getBPMFromSeconds(strumTime);
+            crochet = (60 / map.bpm) * 1000;
+        }
+        else {
+            map = Conductor.getBPMFromSeconds(Conductor.songPosition);
+            crochet = (60 / Conductor.getBPMFromSeconds(strumTime).bpm) * 1000;
+        }
+        
+        return map.songTime + ((strumTime - map.songTime) * crochet / Conductor.crochet);
+    }
+
+    public function getMousePos() {
+        return chained?
+            Conductor.getBPMFromSeconds(getRawMousePos()).songTime + Math.floor((getRawMousePos() - Conductor.getBPMFromSeconds(getRawMousePos()).songTime) / Conductor.getCrochetAtTime(getRawMousePos()) / 4 * ChartEditorState.beatSnap) * Conductor.getCrochetAtTime(getRawMousePos()) * 4 / ChartEditorState.beatSnap
+            :
+            getRawMousePos()
+        ;
+    }
+
     override function update(elapsed:Float) {
         super.update(elapsed);
         var editor:ChartEditorState = ChartEditorState.INSTANCE;
 
-        var mouseStrumTime:Float = ChartEditorState.getMousePos();
+        var mouseStrumTime:Float = getMousePos();
         var GRID_SIZE = ChartEditorState.GRID_SIZE;
 
         chainedMousePos = Conductor.getBPMFromSeconds(mouseStrumTime).songTime + Math.floor((mouseStrumTime - Conductor.getBPMFromSeconds(mouseStrumTime).songTime) / Conductor.getCrochetAtTime(mouseStrumTime) / 4 * ChartEditorState.beatSnap) * Conductor.getCrochetAtTime(mouseStrumTime) * 4 / ChartEditorState.beatSnap;
         x = editor.gridBG.x + Math.floor((FlxG.mouse.x - editor.gridBG.x) / GRID_SIZE) * GRID_SIZE;
-        y = chained? ChartEditorState.Y_OFFSET - (Conductor.songPosition - ChartEditorState.calcY(chainedMousePos)) * GRID_SIZE / Conductor.crochet * 4
-         : FlxG.mouse.y - height / 2;
+        y = ChartEditorState.Y_OFFSET - (Conductor.songPosition - ChartEditorState.calcY(chainedMousePos)) * GRID_SIZE / Conductor.crochet * 4;
         visible = 
             FlxG.mouse.x >= editor.gridBG.x - ChartEditorState.GRID_SIZE && 
             FlxG.mouse.x < editor.gridBG.x + editor.gridBG.width && 
