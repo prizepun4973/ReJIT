@@ -29,7 +29,7 @@ class GuiEventNote extends GuiElement {
 
         makeGraphic(ChartEditorState.GRID_SIZE, 4);
         offset.x -= ChartEditorState.GRID_SIZE * 1.5 - 2;
-        offset.y -= ChartEditorState.GRID_SIZE * 1.5 - 2;
+        offset.y -= ChartEditorState.GRID_SIZE * 1.5;
 
         updatePos();
     }
@@ -38,7 +38,7 @@ class GuiEventNote extends GuiElement {
         updateField('events');
 
         x = ChartEditorState.INSTANCE.nextGridBG.x - ChartEditorState.GRID_SIZE * 2.5 + 2;
-        y = (ChartEditorState.Y_OFFSET - ChartEditorState.GRID_SIZE * 1.5 + 2) - ((Conductor.songPosition - ChartEditorState.calcY(strumTime)) * ChartEditorState.GRID_SIZE / Conductor.crochet * 4);
+        y = (ChartEditorState.Y_OFFSET - ChartEditorState.GRID_SIZE * 1.5) - ((Conductor.songPosition - ChartEditorState.calcY(strumTime)) * ChartEditorState.GRID_SIZE / Conductor.crochet * 4);
 
         alpha = strumTime < Conductor.songPosition ? 0.6 : 1;
     }

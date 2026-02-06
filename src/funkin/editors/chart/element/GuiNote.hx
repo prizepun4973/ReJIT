@@ -13,7 +13,7 @@ class GuiNote extends GuiElement{
     public var susTail:FlxSprite;
     public var typeTxt:FlxText;
 
-    public function new(pushData:Bool, strumTime:Float, noteData:Int, susLength:Float) {
+    public function new(pushData:Bool, strumTime:Float, noteData:Int, susLength:Float, noteType:String = '') {
         super(strumTime);
 
         var parent = ChartEditorState.INSTANCE.renderNotes;

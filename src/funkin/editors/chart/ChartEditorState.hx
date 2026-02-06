@@ -437,8 +437,7 @@ class ChartEditorState extends UIState {
                         true, 
                         crosshair.chained? crosshair.chainedMousePos : crosshair.getMousePos(), 
                         [['Add Camera Zoom', '', '']])])
-                    );
-                    
+                    );  
             }
 
             if (FlxG.keys.justPressed.DELETE) {
@@ -480,9 +479,11 @@ class ChartEditorState extends UIState {
                 for (i in clipBoard) {
                     if (firstStrumTime > data[i].get('strumTime')) firstStrumTime = data[i].get('strumTime');
                 }
-                trace(firstStrumTime);
 
                 var change:Float = crosshair.getMousePos() - firstStrumTime;
+
+                trace(change);
+
                 for (i in clipBoard) {
                     var elementData = data[i];
 
@@ -494,6 +495,7 @@ class ChartEditorState extends UIState {
                                 true,
                                 anchor,
                                 elementData.get('noteData'),
+                                elementData.get('susLength'),
                                 elementData.get('noteType')
                             ));
                         } else {
@@ -504,8 +506,9 @@ class ChartEditorState extends UIState {
                             ));
                         }
                     }
-                    addAction(new ElementAddAction(toAdd));
                 }
+                
+                addAction(new ElementAddAction(toAdd));
             }
 
             if (FlxG.mouse.pressedRight && !FlxG.keys.pressed.CONTROL && crosshair.target != null && !FlxG.keys.pressed.SHIFT && paused) addAction(new ElementRemoveAction([crosshair.target]));

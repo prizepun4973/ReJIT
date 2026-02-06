@@ -70,7 +70,13 @@ class ElementAddAction extends ChartEditorState.EditorAction {
             editor.renderNotes.forEach(function (spr:FlxSprite) {
                 if (Std.isOfType(spr, GuiElement)) {
                     var element:GuiElement = cast (spr, GuiElement);
-                    if (element.dataID == i) editor.removeElement(element);
+                    if (element.dataID == i) {
+                        if (Std.isOfType(spr, GuiNote)) {
+                            var note:GuiNote = (cast (spr, GuiNote));
+                            editor.renderNotes.remove(note.susTail);
+                        } 
+                        editor.removeElement(element);
+                    }
                 }
             });
         }
