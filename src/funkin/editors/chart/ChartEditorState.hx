@@ -525,7 +525,7 @@ class ChartEditorState extends UIState {
                 addAction(new ElementAddAction(toAdd));
             }
 
-            if (FlxG.mouse.pressedRight && !FlxG.keys.pressed.CONTROL && crosshair.target != null && !FlxG.keys.pressed.SHIFT && paused) addAction(new ElementRemoveAction([crosshair.target]));
+            if (FlxG.mouse.pressedRight && !FlxG.keys.pressed.CONTROL && crosshair.target != null && !FlxG.keys.pressed.SHIFT) addAction(new ElementRemoveAction([crosshair.target]));
         }
     }
 
