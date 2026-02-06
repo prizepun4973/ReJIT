@@ -199,6 +199,19 @@ class CoolUtil
 		return FlxColor.fromRGB(parsed[1], parsed[2], parsed[3], parsed[0]);
 	}
 
+	public static function snap(a:Float, b:Float) {
+		return Math.floor(a / b) * b;
+	}
+
+	/**
+	 * Math
+	 * @param a 
+	 * @param b 
+	 */
+	public static function mod(a:Float, b:Float) {
+		return a - snap(a, b);
+	}
+
 	public static function getStateByString(state:String):FlxState {
 		switch(state) {
 			default:

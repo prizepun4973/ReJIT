@@ -69,6 +69,14 @@ class TextBoxWidget extends FlxSprite {
         
     }
 
+    public function setText(result:String) {
+        displayText.text = result;
+    }
+
+    public function getText() {
+        return displayText.text;
+    }
+
     public static function getKeyName(key:FlxKey):String {
         var blackList:Array<FlxKey> = [
             NONE,

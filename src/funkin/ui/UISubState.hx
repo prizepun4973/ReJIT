@@ -12,8 +12,9 @@ import lime.ui.*;
 
 class UISubState extends funkin.jit.InjectedSubState {
     var textBoxs:Array<TextBoxWidget> = [];
-
     var defaultGroup:FlxTypedGroup<FlxBasic> = new FlxTypedGroup<FlxBasic>();
+
+    public var onClose:Void -> Void = function () {};
 
     override public function new(script:String) {
         super(script);
@@ -36,7 +37,7 @@ class UISubState extends funkin.jit.InjectedSubState {
     }
 
     public function addText(X, Y, _text:String) {
-        var text = new FlxText(X + 2, Y + 2, 114, _text, 18);
+        var text = new FlxText(X, Y, 114, _text, 18);
         text.wordWrap = false;
         text.autoSize = true;
         text.setFormat(Paths.font("vcr.ttf"), 18, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -73,7 +74,10 @@ class UISubState extends funkin.jit.InjectedSubState {
                 for (textBox in textBoxs) {
                     if (!textBox.editing) canExit = true;
                 }
-                if (canExit) close();
+                if (canExit) {
+                    onClose();
+                    close();
+                }
         }
     }
 }
