@@ -39,6 +39,7 @@ import sys.FileSystem;
 
 import Conductor.BPMChangeEvent;
 
+import funkin.editors.chart.handle.*;
 import funkin.editors.chart.element.*;
 import funkin.editors.chart.action.*;
 import funkin.editors.chart.window.*;
@@ -63,7 +64,7 @@ class ChartEditorState extends UIState {
 
     // data
     public static var _song:SwagSong;
-    private var sectionBPM:Array<Float> = [];
+    public var sectionBPM:Array<Float> = [];
 
     var _file:FileReference;
 
@@ -223,13 +224,13 @@ class ChartEditorState extends UIState {
         }
         if (songPos < lastUpdateTime && songPos >= 0) {
             curSec--;
-            Conductor.changeBPM(sectionBPM[curSec]);
 
-            trace(lastUpdateTime);
+            if (curSec < 0) curSec = 0;
+
+            Conductor.changeBPM(sectionBPM[curSec]);
 
             nextUpdateTime = lastUpdateTime;
             lastUpdateTime -= _song.notes[curSec].sectionBeats * Conductor.crochet;
-
         }
 
         gridBG.scale.y = _song.notes[curSec].sectionBeats / 4;
@@ -305,6 +306,21 @@ class ChartEditorState extends UIState {
 		FlxG.log.error("Problem saving Level data");
 	}
 
+    public function updateBPM() {
+        sectionBPM = [];
+
+        var lastBPM:Float = _song.bpm;
+        for (section in _song.notes) {
+            if (!Std.isOfType(section.sectionBeats, Float) || section.sectionBeats < 1) section.sectionBeats = 4;
+
+            if (section.changeBPM) lastBPM = section.bpm;
+            sectionBPM.push(lastBPM);
+        }
+
+        Conductor.mapBPMChanges(ChartEditorState._song);
+        Conductor.changeBPM(sectionBPM[curSec]);
+    }
+
     public function new() {
         super("ChartEditorState");
         INSTANCE = this;
@@ -347,15 +363,11 @@ class ChartEditorState extends UIState {
             undos[undos.length - 1].undo();
             redos.push(undos[undos.length - 1]);
             undos.pop();
-            // trace(undos);
-            // trace(redos);
         }
         if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.Y && redos.length > 0) {
             redos[redos.length - 1].redo();
             undos.push(redos[redos.length - 1]);
             redos.remove(redos[redos.length - 1]);
-            trace(undos);
-            trace(redos);
         }
 
         if (FlxG.keys.pressed.CONTROL && FlxG.keys.pressed.ALT && FlxG.keys.justPressed.S) {
@@ -404,9 +416,6 @@ class ChartEditorState extends UIState {
         sectionStopLine.y = Y_OFFSET - (songPos - nextUpdateTime) * GRID_SIZE / Conductor.crochet * 4 - sectionStopLine.height / 2;
 
         var anchor:Float = CoolUtil.mod(Conductor.songPosition - lastUpdateTime, Conductor.getCrochetAtTime(Conductor.songPosition));
-
-        if (FlxG.keys.justPressed.R) trace(anchor);
-
         anchor = Y_OFFSET - anchor * GRID_SIZE / Conductor.crochet * 4 - sectionStartLine.height / 2;
 
         for (i in 0...beatSplitLine.length) {
@@ -496,13 +505,10 @@ class ChartEditorState extends UIState {
 
                 var change:Float = crosshair.getMousePos() - firstStrumTime;
 
-                trace(change);
-
                 for (i in clipBoard) {
                     var elementData = data[i];
 
                     var anchor:Float = elementData.get('strumTime') + change;
-                    // trace(anchor);
                     if (anchor >= 0) {
                         if (elementData.get('events') == null) {
                             toAdd.push(new GuiNote(
@@ -562,21 +568,35 @@ class ChartEditorState extends UIState {
                         var window:UISubState = new UISubState('SectionWindow');
 
                         openSubState(window);
-                        window.setBG(400, 400);
-                        var beatsTextBox = window.addTextBox(390, 390, 50, Std.string(section.sectionBeats), function (textBox) {
-                            if (Std.parseInt(textBox.getText()) == null) textBox.setText('4');
+                        
+                        window.setBG(800, 400);
+
+                        window.addText(250, 170, 'Beats:');
+                        var beatTextBox = window.addTextBox(320, 168, 50, '4', function (textBox) {
+                            if (textBox.getInt() == null) textBox.setText('4');
                         });
+
+                        var mustHitCheckBox = window.addCheckBox(250, 200, 'BF/MustHit Section: ', section.mustHitSection, function (value) {});
+                        var gfCheckBox = window.addCheckBox(250, 230, 'GF Section: ', section.gfSection, function (value) {});
+
+                        window.addText(250, 260, 'BPM: ');
+                        var bpmTextBox = window.addTextBox(320, 258, 50, Std.string(section.bpm), function (textBox) {
+                            if (textBox.getInt() == null) textBox.setText(Std.string(section.bpm));
+                        });
+
+                        var bpmCheckBox = window.addCheckBox(250, 292, 'Change BPM: ', section.changeBPM, function (value) {});
+                        var altCheckBox = window.addCheckBox(250, 322, 'Alt Anim: ', section.altAnim, function (value) {});
 
                         window.onClose = function () {
                             addAction(new SectionAction({
                                 sectionNotes: [],
-                                sectionBeats: Std.parseInt(beatsTextBox.getText()),
+                                sectionBeats: beatTextBox.getInt(),
                                 typeOfSection: section.typeOfSection,
-                                mustHitSection: false,
-                                gfSection: false,
-                                bpm: Conductor.getBPMFromSeconds(songPos).bpm,
-                                changeBPM: false,
-                                altAnim: false
+                                mustHitSection: mustHitCheckBox.activated,
+                                gfSection: gfCheckBox.activated,
+                                bpm: bpmTextBox.getInt(),
+                                changeBPM: bpmCheckBox.activated,
+                                altAnim: altCheckBox.activated
                             }, curSec));
                         }
                 }
@@ -615,13 +635,7 @@ class ChartEditorState extends UIState {
         Conductor.mapBPMChanges(_song);
 		Conductor.changeBPM(_song.bpm);
 
-        var lastBPM:Float = _song.bpm;
-        for (section in _song.notes) {
-            if (!Std.isOfType(section.sectionBeats, Float) || section.sectionBeats < 1) section.sectionBeats = 4;
-
-            if (section.changeBPM) lastBPM = section.bpm;
-            sectionBPM.push(lastBPM);
-        }
+        updateBPM();
 
         /*
             audio
@@ -662,14 +676,12 @@ class ChartEditorState extends UIState {
         nextGridBG = FlxGridOverlay.create(GRID_SIZE, GRID_SIZE, GRID_SIZE * 8, GRID_SIZE * 50);
         nextGridBG.alpha = 0.8;
         nextGridBG.screenCenter(X);
-        nextGridBG.x -= GRID_SIZE / 2;
         nextGridBG.y = Y_OFFSET;
         gridGroup.add(nextGridBG);
 
         gridBG = new FlxSprite().makeGraphic(GRID_SIZE * 8, GRID_SIZE * 16, FlxColor.WHITE);
         gridBG.screenCenter(X);
         gridBG.alpha = 0.3;
-        gridBG.x -= GRID_SIZE / 2;
         gridGroup.add(gridBG);
 
         gridGroup.add(new FlxSprite(nextGridBG.x + GRID_SIZE * 4 - 1, 0).makeGraphic(2, Std.int(nextGridBG.height), FlxColor.BLACK));
@@ -699,24 +711,20 @@ class ChartEditorState extends UIState {
         for (i in 0...6) {
             var splitLine:FlxSprite = new FlxSprite(0, Y_OFFSET).makeGraphic(GRID_SIZE * 8, 2, FlxColor.RED);
             splitLine.screenCenter(X);
-            splitLine.x -= GRID_SIZE / 2;
             hudGroup.add(splitLine);
             beatSplitLine.push(splitLine);
         }
 
         sectionStartLine = new FlxSprite(0, Y_OFFSET).makeGraphic(GRID_SIZE * 8, 2, FlxColor.GREEN);
         sectionStartLine.screenCenter(X);
-        sectionStartLine.x -= GRID_SIZE / 2;
         hudGroup.add(sectionStartLine);
 
         sectionStopLine = new FlxSprite(0, Y_OFFSET).makeGraphic(GRID_SIZE * 8, 2, FlxColor.GREEN);
         sectionStopLine.screenCenter(X);
-        sectionStopLine.x -= GRID_SIZE / 2;
         hudGroup.add(sectionStopLine);
 
         conductorLine = new FlxSprite(0, Y_OFFSET).makeGraphic(GRID_SIZE * 10, 4, FlxColor.WHITE);
         conductorLine.screenCenter(X);
-        conductorLine.x -= GRID_SIZE / 2;
         hudGroup.add(conductorLine);
 
         crosshair = new Crosshair();
@@ -753,133 +761,4 @@ class ChartEditorState extends UIState {
 
         call('postCreate', []);
     }
-}
-
-class SelectIndicator extends FlxSprite {
-    public var target:GuiElement;
-
-    public function new(target:GuiElement) {
-        super(0, 0);
-
-        this.target = target;
-
-        makeGraphic(ChartEditorState.GRID_SIZE, ChartEditorState.GRID_SIZE, 0xff00FFFF);
-
-        updatePos();
-    }
-
-    override function update(elapsed:Float) {
-        super.update(elapsed);
-        updatePos();
-    }
-
-    function updatePos() {
-        x = target.x + ChartEditorState.GRID_SIZE * 1.5 - 2;
-        y = target.y + ChartEditorState.GRID_SIZE * 1.5;
-    }
-}
-class Crosshair extends FlxSprite {
-    public var target:GuiElement;
-    public var chained:Bool = true;
-
-    public function new() {
-        super(0, 0);
-        makeGraphic(ChartEditorState.GRID_SIZE, ChartEditorState.GRID_SIZE, 0xffBD99FF);
-        alpha = 0.5;
-    }
-
-    public static function getRawMousePos() {
-        var strumTime:Float = Conductor.songPosition + (FlxG.mouse.y - ChartEditorState.Y_OFFSET) / (ChartEditorState.GRID_SIZE / Conductor.crochet * 4);
-        var map:BPMChangeEvent;
-        var crochet:Float;
-        if (Conductor.songPosition <= strumTime) {
-            map = Conductor.getBPMFromSeconds(strumTime);
-            crochet = (60 / map.bpm) * 1000;
-        }
-        else {
-            map = Conductor.getBPMFromSeconds(Conductor.songPosition);
-            crochet = (60 / Conductor.getBPMFromSeconds(strumTime).bpm) * 1000;
-        }
-        
-        return map.songTime + ((strumTime - map.songTime) * crochet / Conductor.crochet);
-    }
-
-    public function getMousePos() {
-        return chained?
-            Conductor.getBPMFromSeconds(getRawMousePos()).songTime + CoolUtil.snap(getRawMousePos() - Conductor.getBPMFromSeconds(getRawMousePos()).songTime, Conductor.getCrochetAtTime(getRawMousePos()) * 4 / ChartEditorState.beatSnap)
-            :
-            getRawMousePos()
-        ;
-    }
-
-    override function update(elapsed:Float) {
-        super.update(elapsed);
-        var editor:ChartEditorState = ChartEditorState.INSTANCE;
-
-        var mouseStrumTime:Float = getMousePos();
-        var GRID_SIZE = ChartEditorState.GRID_SIZE;
-
-        x = editor.gridBG.x + Math.floor((FlxG.mouse.x - editor.gridBG.x) / GRID_SIZE) * GRID_SIZE;
-        y = ChartEditorState.Y_OFFSET - (Conductor.songPosition - ChartEditorState.calcY(getMousePos())) * GRID_SIZE / Conductor.crochet * 4;
-        visible = 
-            FlxG.mouse.x >= editor.gridBG.x - ChartEditorState.GRID_SIZE && 
-            FlxG.mouse.x < editor.gridBG.x + editor.gridBG.width && 
-            mouseStrumTime >= 0 && 
-            mouseStrumTime <= FlxG.sound.music.length && 
-            ChartEditorState.INSTANCE.canInput();
-
-        var anyHovered = false;
-        editor.renderNotes.forEachAlive(function (sprite:FlxSprite) {
-            if (Std.isOfType(sprite, GuiElement)) {
-                var hitboxScale = 16 / ChartEditorState.beatSnap * ChartEditorState.GRID_SIZE;
-                var element:GuiElement = cast (sprite, GuiElement);
-                var x1:Float = element.x + GRID_SIZE * 1.5 - 2;
-                var y1:Float = element.y + GRID_SIZE * 1.5;
-                var x2:Float = x1 + GRID_SIZE;
-                var y2:Float = y1 + hitboxScale;
-
-                if (FlxG.mouse.x >= x1 && FlxG.mouse.x <= x2 && FlxG.mouse.y >= y1 && FlxG.mouse.y <= y2 && !anyHovered) {
-                    target = element;
-                    anyHovered = true;
-                }
-                else if (!anyHovered) target = null;
-            }
-            else if (!anyHovered) target = null;
-        });
-    }
-}
-
-class GuiElement extends FlxSprite {
-    public var strumTime:Float = 0;
-    public var dataID:Int;
-    public var editor:ChartEditorState = ChartEditorState.INSTANCE;
-
-    public function new(strumTime:Float) {
-        super(0, 0);
-        this.strumTime = strumTime;
-    }
-
-    function updateField(name:String) {
-        Reflect.setProperty(this, name, ChartEditorState.data[dataID].get(name));
-    }
-
-    override function update(elapsed:Float) {
-        ChartEditorState.INSTANCE.updateGrid();
-        updatePos();
-        if (ChartEditorState.data[dataID] != null) {
-            var result:Null<Float> = ChartEditorState.data[dataID].get('strumTime');
-            if (result != null) strumTime = result;
-        }
-        super.update(elapsed);
-    }
-
-    function updatePos() {}
-}
-
-abstract class EditorAction {
-    public var editor:ChartEditorState = ChartEditorState.INSTANCE;
-    public var dataID:Int;
-    public function new() {}
-    public function redo() {}
-    public function undo() {}
 }

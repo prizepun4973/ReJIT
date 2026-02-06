@@ -16,6 +16,10 @@ class UISubState extends funkin.jit.InjectedSubState {
 
     public var onClose:Void -> Void = function () {};
 
+    override function create() {
+        call('create', []);
+    }
+
     override public function new(script:String) {
         super(script);
         flixel.FlxG.stage.window.onKeyDown.add(onKeyDown);
@@ -23,8 +27,9 @@ class UISubState extends funkin.jit.InjectedSubState {
     }
 
     public function setBG(w:Int, h:Int) {
-        var bg:FlxSprite = new FlxSprite(0, 0).makeGraphic(w, h, 0x64191919);
+        var bg:FlxSprite = new FlxSprite(0, 0).makeGraphic(w, h, 0xFF3D3F41);
         bg.centerOffsets();
+        bg.updateHitbox();
         bg.screenCenter();
         defaultGroup.add(bg);
         return bg;

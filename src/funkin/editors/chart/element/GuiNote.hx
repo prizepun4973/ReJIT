@@ -1,7 +1,6 @@
 package funkin.editors.chart.element;
 
 import funkin.editors.chart.ChartEditorState;
-import funkin.editors.chart.ChartEditorState.GuiElement;
 import flixel.FlxSprite;
 import flixel.text.FlxText;
 

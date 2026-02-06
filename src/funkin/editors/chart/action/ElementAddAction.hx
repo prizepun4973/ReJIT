@@ -1,15 +1,14 @@
 package funkin.editors.chart.action;
 
 import funkin.editors.chart.ChartEditorState;
-import funkin.editors.chart.ChartEditorState.GuiElement;
-import funkin.editors.chart.ChartEditorState.EditorAction;
-import funkin.editors.chart.ChartEditorState.SelectIndicator;
+import funkin.editors.chart.element.GuiElement;
+import funkin.editors.chart.handle.SelectIndicator;
 import funkin.editors.chart.element.*;
 import funkin.game.component.Note.EventNote;
 import flixel.FlxG;
 import flixel.FlxSprite;
 
-class ElementAddAction extends ChartEditorState.EditorAction {
+class ElementAddAction extends EditorAction {
     public var datas:Array<Int> = [];
     public var elements:Array<GuiElement> = [];
 
@@ -22,7 +21,7 @@ class ElementAddAction extends ChartEditorState.EditorAction {
     }
 
     override function redo() {
-        var nextTarget:ChartEditorState.GuiElement = null;
+        var nextTarget:GuiElement = null;
 
         if (datas.length > 0) {
             for (i in datas) {

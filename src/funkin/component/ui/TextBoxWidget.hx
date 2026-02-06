@@ -172,4 +172,8 @@ class TextBoxWidget extends FlxSprite {
 				return shift? result : result.toLowerCase();
 		}
 	}
+
+    public function getInt():Dynamic {
+        return Std.parseInt(getText());
+    }
 }

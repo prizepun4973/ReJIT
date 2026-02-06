@@ -8,7 +8,7 @@ class CheckBoxWidget extends flixel.FlxSprite {
     var onClick:Bool -> Void;
     var text:FlxText;
 
-    var activated:Bool = false;
+    public var activated:Bool = false;
 
     public override function new(parent:flixel.group.FlxGroup.FlxTypedGroup<flixel.FlxBasic>, X:Float, Y:Float, checkBoxText:String, activated:Bool, onClick:Bool -> Void) {
         super(X, Y);
@@ -24,7 +24,7 @@ class CheckBoxWidget extends flixel.FlxSprite {
 
         x += text.width + 6;
         
-        color = activated ? 0xFFFFFFFF : 0xFFFFFF00;
+        color = activated ? 0xFFFFFF00 : 0xFFFFFFFF;
 
         parent.add(this);
         parent.add(text);
@@ -37,7 +37,7 @@ class CheckBoxWidget extends flixel.FlxSprite {
         if (CoolUtil.mouseInRange(x, x + width, y, y + height) && FlxG.mouse.justReleased) {
             activated = !activated;
             onClick(activated);
-            color = activated ? 0xFFFFFFFF : 0xFFFFFF00;
+            color = activated ? 0xFFFFFF00 : 0xFFFFFFFF;
         }
     }
 }
