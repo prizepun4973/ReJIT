@@ -590,14 +590,53 @@ class ChartEditorState extends UIState {
                         window.onClose = function () {
                             addAction(new SectionAction({
                                 sectionNotes: [],
-                                sectionBeats: beatTextBox.getInt(),
+                                sectionBeats: beatTextBox.getFloat(),
                                 typeOfSection: section.typeOfSection,
                                 mustHitSection: mustHitCheckBox.activated,
                                 gfSection: gfCheckBox.activated,
-                                bpm: bpmTextBox.getInt(),
+                                bpm: bpmTextBox.getFloat(),
                                 changeBPM: bpmCheckBox.activated,
                                 altAnim: altCheckBox.activated
                             }, curSec));
+                        }
+
+                    case "Edit Selected Notes":
+                        var shouldQuit:Bool = true;
+                        var prevType:String = null;
+                        var isCommon:Bool = true;
+                        selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
+                            if (Std.isOfType(indicator.target, GuiNote)) {
+                                shouldQuit = false;
+                                var note:GuiNote = cast (indicator.target, GuiNote);
+                                trace(note.noteType);
+                                if (prevType != note.noteType) {
+                                    if (prevType == null) {
+                                        prevType = note.noteType;
+                                        trace(prevType);
+                                    }
+                                    else isCommon = false;
+                                }
+                            }
+                        });
+
+                        if (shouldQuit) return;
+
+                        var window:UISubState = new UISubState('NoteWindow');
+                        openSubState(window);
+                        window.setBG(800, 400);
+                        window.addText(250, 170, 'Type:');
+
+                        if (!isCommon) prevType = '';
+
+                        var datas:Array<Int> = [];
+                        var typeTextBox = window.addTextList(320, 168, 200, prevType, ['a', 'b', 'c'], function (textBox) {});
+
+                        selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
+                            if (Std.isOfType(indicator.target, GuiNote)) datas.push((cast (indicator.target, GuiNote)).dataID);
+                        });
+
+                        window.onClose = function () {
+                            addAction(new NoteTypeAction(datas, typeTextBox.getText()));
                         }
                 }
         }

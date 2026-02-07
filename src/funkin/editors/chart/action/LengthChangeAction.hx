@@ -1,10 +1,6 @@
 package funkin.editors.chart.action;
 
 import funkin.editors.chart.ChartEditorState;
-import funkin.editors.chart.element.GuiElement;
-import funkin.editors.chart.handle.SelectIndicator;
-import funkin.editors.chart.element.*;
-import funkin.game.component.Note.EventNote;
 import flixel.FlxG;
 import flixel.FlxSprite;
 

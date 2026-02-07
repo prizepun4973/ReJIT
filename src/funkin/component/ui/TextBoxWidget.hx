@@ -176,4 +176,8 @@ class TextBoxWidget extends FlxSprite {
     public function getInt():Dynamic {
         return Std.parseInt(getText());
     }
+
+    public function getFloat() {
+        return Std.parseFloat(getText());
+    }
 }

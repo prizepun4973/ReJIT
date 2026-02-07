@@ -6,6 +6,7 @@ import funkin.jit.InjectedSubState;
 import flixel.util.FlxColor;
 import flixel.text.FlxText;
 import flixel.FlxSprite;
+import flixel.FlxG;
 import funkin.component.ui.*;
 
 import lime.ui.*;
@@ -22,8 +23,12 @@ class UISubState extends funkin.jit.InjectedSubState {
 
     override public function new(script:String) {
         super(script);
-        flixel.FlxG.stage.window.onKeyDown.add(onKeyDown);
+        FlxG.stage.window.onKeyDown.add(onKeyDown);
         add(defaultGroup);
+    }
+
+    public override function destroy() {
+        FlxG.stage.window.onKeyDown.remove(onKeyDown);
     }
 
     public function setBG(w:Int, h:Int) {
