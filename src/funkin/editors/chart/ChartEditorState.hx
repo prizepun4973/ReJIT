@@ -450,15 +450,16 @@ class ChartEditorState extends UIState {
 
     function actionListener() {
         if (crosshair.visible) {
-            if (FlxG.mouse.pressed && !FlxG.keys.pressed.CONTROL && !FlxG.keys.pressed.SHIFT && crosshair.target == null) {
+            if (FlxG.mouse.justPressed && !FlxG.keys.pressed.CONTROL && !FlxG.keys.pressed.SHIFT && crosshair.target == null) {
                 if (FlxG.mouse.x > gridBG.x) {
-                    addAction(new ElementAddAction([
-                        new GuiNote(
+                    var note:GuiNote = new GuiNote(
                             true, 
                             crosshair.getMousePos(), 
                             Math.floor((FlxG.mouse.x - gridBG.x) / GRID_SIZE),
                             0
-                    )]));
+                    );
+                    addAction(new ElementAddAction([note]));
+                    crosshair.dragTarget = note;
                 }
                 else addAction(new ElementAddAction([new GuiEventNote(
                         true, 
@@ -466,6 +467,13 @@ class ChartEditorState extends UIState {
                         [['Add Camera Zoom', '', '']])])
                     );  
             }
+
+            if (Std.isOfType(crosshair.dragTarget, GuiNote) && crosshair.dragTarget != null) {
+                var note:GuiNote = cast (lastTarget, GuiNote);
+                if (FlxG.mouse.pressed)
+                    data[note.dataID].set('susLength', Math.max(0, crosshair.getMousePos() - note.strumTime));
+            }
+
 
             if (FlxG.keys.justPressed.DELETE) {
                 var toDelete:Array<GuiElement> = new Array();
@@ -790,7 +798,7 @@ class ChartEditorState extends UIState {
         textPanel.autoSize = true;
         hudGroup.add(textPanel);
 
-        textPanel1 = new FlxText(140, FlxG.height - bottomHeight + 1, 0, "hi", 12);
+        textPanel1 = new FlxText(180, FlxG.height - bottomHeight + 1, 0, "hi", 12);
         textPanel1.setFormat(Paths.font("vcr.ttf", false), 16, FlxColor.WHITE, LEFT);
         textPanel1.wordWrap = false;
         textPanel1.autoSize = true;
