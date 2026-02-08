@@ -28,6 +28,7 @@ class UISubState extends funkin.jit.InjectedSubState {
     }
 
     public override function destroy() {
+        super.destroy();
         FlxG.stage.window.onKeyDown.remove(onKeyDown);
     }
 

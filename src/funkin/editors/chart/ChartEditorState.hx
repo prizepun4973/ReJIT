@@ -312,6 +312,10 @@ class ChartEditorState extends UIState {
         var lastBPM:Float = _song.bpm;
         for (section in _song.notes) {
             if (!Std.isOfType(section.sectionBeats, Float) || section.sectionBeats < 1) section.sectionBeats = 4;
+            if (!Std.isOfType(section.bpm, Float) || section.bpm < 0) section.bpm = _song.bpm;
+            if (!Std.isOfType(section.gfSection, Bool)) section.gfSection = false;
+            if (!Std.isOfType(section.changeBPM, Bool)) section.changeBPM = false;
+            if (!Std.isOfType(section.altAnim, Bool)) section.altAnim = false;
 
             if (section.changeBPM) lastBPM = section.bpm;
             sectionBPM.push(lastBPM);
@@ -572,7 +576,7 @@ class ChartEditorState extends UIState {
                         window.setBG(800, 400);
 
                         window.addText(250, 170, 'Beats:');
-                        var beatTextBox = window.addTextBox(320, 168, 50, '4', function (textBox) {
+                        var beatTextBox = window.addTextBox(320, 168, 50, Std.string(section.sectionBeats), function (textBox) {
                             if (textBox.getInt() == null) textBox.setText('4');
                         });
 
@@ -588,6 +592,14 @@ class ChartEditorState extends UIState {
                         var altCheckBox = window.addCheckBox(250, 322, 'Alt Anim: ', section.altAnim, function (value) {});
 
                         window.onClose = function () {
+                            if (beatTextBox.getText() == Std.string(section.sectionBeats) &&
+                                mustHitCheckBox.activated == section.mustHitSection &&
+                                gfCheckBox.activated == section.gfSection &&
+                                bpmTextBox.getText() == Std.string(section.bpm) &&
+                                bpmCheckBox.activated == section.changeBPM &&
+                                altCheckBox.activated == section.altAnim
+                            ) return;
+
                             addAction(new SectionAction({
                                 sectionNotes: [],
                                 sectionBeats: beatTextBox.getFloat(),
@@ -788,7 +800,7 @@ class ChartEditorState extends UIState {
             ['File', 'Edit', 'Help'], [
 
             ['Edit Chart Data', 'Save', 'Save Event', 'Save As', 'Save Event As', 'Reload Audio', 'Reload Chart', 'Load Events', 'Exit'], 
-            ['Edit Current Section', 'Edit Selected Notes', 'Go To', 'Swap', 'Duet', 'Mirror', 'Clear Section', 'Clear Notes', 'Clear Events'],
+            ['Edit Current Section', 'Edit Selected Notes', 'Go To'],
             ['Instructions']
         ]);
 
