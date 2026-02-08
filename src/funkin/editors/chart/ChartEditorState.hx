@@ -123,18 +123,18 @@ class ChartEditorState extends UIState {
     }
 
     public static function calcY(strumTime:Float = 0) {
-        var map:BPMChangeEvent;
-        var crochet:Float;
-        if (Conductor.songPosition <= strumTime) {
-            map = Conductor.getBPMFromSeconds(strumTime);
-            crochet = (60 / map.bpm) * 1000;
-        }
-        else {
-            map = Conductor.getBPMFromSeconds(Conductor.songPosition);
-            crochet = (60 / Conductor.getBPMFromSeconds(strumTime).bpm) * 1000;
-        }
-        
-        return map.songTime + ((strumTime - map.songTime) / crochet * Conductor.crochet);
+        var map:BPMChangeEvent = Conductor.getBPMFromSeconds(strumTime);
+        var crochet:Float = (60 / map.bpm) * 1000;
+
+        if (Conductor.songPosition < map.songTime)     
+            return map.songTime + ((strumTime - map.songTime) / crochet * Conductor.crochet);
+
+        map = Conductor.getBPMFromSeconds(Conductor.songPosition);
+
+        if (strumTime < map.songTime)     
+            return map.songTime + ((strumTime - map.songTime) / crochet * Conductor.crochet);
+
+        return strumTime;
     }
 
     public function removeElement(element:GuiElement) {
@@ -552,6 +552,7 @@ class ChartEditorState extends UIState {
             case "File":
                 switch (line) {
                     case "Save As":
+                        saveChanges();
                         if(_song.events != null && _song.events.length > 1) _song.events.sort(CoolUtil.sortByTime);
 
                         var data:String = Json.stringify({"song": _song}, "\t");
@@ -561,6 +562,7 @@ class ChartEditorState extends UIState {
                         _file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
                         _file.save(data, '${Paths.formatToSongPath(_song.song)}.json');
                     case "Save Event As":
+                        saveChanges();
                         if(_song.events != null && _song.events.length > 1) _song.events.sort(CoolUtil.sortByTime);
 
                             var data:String = Json.stringify({"song": { events: _song.events }}, "\t");

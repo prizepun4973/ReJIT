@@ -76,6 +76,6 @@ class GuiNote extends GuiElement{
         susTail.y = y + ChartEditorState.GRID_SIZE * 2.25 + (ChartEditorState.GRID_SIZE * (susLength / crochet * 2));
         susTail.visible = susLength > 0;
         susTail.alpha = alpha;
-        susTail.setGraphicSize(susTail.width, ChartEditorState.GRID_SIZE * (susLength / crochet * 4 + 0.5));
+        susTail.setGraphicSize(susTail.width, ChartEditorState.GRID_SIZE * (susLength / crochet * 4 + 0.5)); // TODO: Fix this
     }
 }
