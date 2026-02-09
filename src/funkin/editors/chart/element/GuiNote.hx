@@ -36,22 +36,14 @@ class GuiNote extends GuiElement{
         
 		susTail = new FlxSprite(0, 0).makeGraphic(8, 1);
 
-        switch (noteData) {
-            case 0 | 4 :
-                animation.addByPrefix("note", "purple0");
-                susTail.color = 0xdda0dd;
-            case 1 | 5 :
-                animation.addByPrefix("note", "blue0");
-                susTail.color = 0x00ffff;
-            case 2 | 6 :
-                animation.addByPrefix("note", "green0");
-                susTail.color = 0x5CE65C;
-            case 3 | 7 :
-                animation.addByPrefix("note", "red0");
-                susTail.color = 0xED2939;
-        }
-
-        animation.play("note");
+        animation.addByPrefix("0", "purple0");
+        animation.addByPrefix("1", "blue0");
+        animation.addByPrefix("2", "green0");
+        animation.addByPrefix("3", "red0");
+        animation.addByPrefix("4", "purple0");
+        animation.addByPrefix("5", "blue0");
+        animation.addByPrefix("6", "green0");
+        animation.addByPrefix("7", "red0");
 
         parent.add(susTail);
         parent.add(this);
@@ -65,6 +57,19 @@ class GuiNote extends GuiElement{
         updateField('noteData');
         updateField('susLength');
         updateField('noteType');
+
+        animation.play(Std.string(noteData));
+
+        switch (noteData) {
+            case 0 | 4 :
+                susTail.color = 0xdda0dd;
+            case 1 | 5 :
+                susTail.color = 0x00ffff;
+            case 2 | 6 :
+                susTail.color = 0x5CE65C;
+            case 3 | 7 :
+                susTail.color = 0xED2939;
+        }
 
         x =  ChartEditorState.INSTANCE.nextGridBG.x - ChartEditorState.GRID_SIZE * 2.5 + (noteData + 1) * ChartEditorState.GRID_SIZE + 2;
         y = (ChartEditorState.Y_OFFSET - ChartEditorState.GRID_SIZE * 1.5) - ((Conductor.songPosition - ChartEditorState.calcY(strumTime)) / crochet * 4 * ChartEditorState.GRID_SIZE);

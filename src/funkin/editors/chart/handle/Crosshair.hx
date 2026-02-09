@@ -11,10 +11,16 @@ class Crosshair extends FlxSprite {
     public var chained:Bool = true;
 
     public var dragTarget:GuiElement;
+    public var lastTarget:GuiElement;
+
+    public var offsetX:Float;
+    public var offsetY:Float;
+
+    public var onDragFinished:Void -> Void = function () {};
 
     public function new() {
         super(0, 0);
-        makeGraphic(ChartEditorState.GRID_SIZE, ChartEditorState.GRID_SIZE, 0xffBD99FF);
+        makeGraphic(ChartEditorState.GRID_SIZE, ChartEditorState.GRID_SIZE, 0xffAAAAAA);
         alpha = 0.5;
     }
 
@@ -24,7 +30,7 @@ class Crosshair extends FlxSprite {
         var mouseStrumTime:Float = getMousePos();
         var GRID_SIZE = ChartEditorState.GRID_SIZE;
 
-        x = editor.gridBG.x + Math.floor((FlxG.mouse.x - editor.gridBG.x) / GRID_SIZE) * GRID_SIZE;
+        x = editor.gridBG.x + CoolUtil.snap((FlxG.mouse.x - editor.gridBG.x), GRID_SIZE);
         y = ChartEditorState.Y_OFFSET - (Conductor.songPosition - ChartEditorState.calcY(getMousePos())) * GRID_SIZE / Conductor.crochet * 4;
         visible = 
             FlxG.mouse.x >= editor.gridBG.x - ChartEditorState.GRID_SIZE && 
@@ -62,8 +68,21 @@ class Crosshair extends FlxSprite {
     function updateDragTarget() {
         var editor:ChartEditorState = ChartEditorState.INSTANCE;
 
-        if (FlxG.mouse.justPressed) dragTarget = target;
-        if (FlxG.mouse.justReleased) dragTarget = null;
+        if (FlxG.mouse.justPressed && !FlxG.keys.pressed.CONTROL)
+            dragTarget = target;
+        
+        if (FlxG.mouse.justReleased || FlxG.keys.justReleased.SHIFT) {
+            onDragFinished();
+            dragTarget = null;
+
+            offsetX = 0;
+            offsetY = 0;
+        }
+
+        if (dragTarget != null && visible && x > editor.gridBG.x - ChartEditorState.GRID_SIZE && FlxG.keys.pressed.SHIFT) {
+            offsetX = dragTarget.x - x + ChartEditorState.GRID_SIZE * 1.5 - 2;
+            offsetY = dragTarget.y - y + ChartEditorState.GRID_SIZE * 1.5;
+        }
     }
 
     override function update(elapsed:Float) {

@@ -54,12 +54,13 @@ class ElementAddAction extends EditorAction {
         }
 
         editor.selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
-            if (indicator.target == editor.lastTarget) {
+            if (indicator.target == editor.crosshair.lastTarget) {
                 editor.selectIndicator.remove(indicator);
                 ChartEditorState.data[indicator.target.dataID].set('wasSelected', false);
             }
         });
-        editor.lastTarget = nextTarget;
+
+        editor.crosshair.lastTarget = nextTarget;
     }
 
     override function undo() {

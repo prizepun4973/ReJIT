@@ -23,7 +23,7 @@ class SelectIndicator extends FlxSprite {
     }
 
     function updatePos() {
-        x = target.x + ChartEditorState.GRID_SIZE * 1.5 - 2;
-        y = target.y + ChartEditorState.GRID_SIZE * 1.5;
+        x = target.x - ChartEditorState.INSTANCE.crosshair.offsetX + ChartEditorState.GRID_SIZE * 1.5 - 2;
+        y = target.y - ChartEditorState.INSTANCE.crosshair.offsetY + ChartEditorState.GRID_SIZE * 1.5;
     }
 }

@@ -93,8 +93,6 @@ class ChartEditorState extends UIState {
     private var beatSplitLine:Array<FlxSprite> = [];
     public var crosshair:Crosshair;
 
-    public var lastTarget:GuiElement = null;
-
     private var textPanel:FlxText;
     private var textPanel1:FlxText;
 
@@ -120,6 +118,21 @@ class ChartEditorState extends UIState {
             FlxG.mouse.y < FlxG.height - bottomHeight && 
             !tab.isFocused()
         ;
+    }
+
+    public function removeElementByDataID(i:Int) {
+        renderNotes.forEachAlive(function (spr:FlxSprite) {
+            if (Std.isOfType(spr, GuiElement)) {
+                var element = cast (spr, GuiElement);
+                if (element.dataID == i) {
+                    if (Std.isOfType(spr, GuiNote)) {
+                        var note = cast (spr, GuiNote);
+                        renderNotes.remove(note.susTail);
+                    }
+                    removeElement(element);
+                }
+            }
+        });
     }
 
     public static function calcY(strumTime:Float = 0) {
@@ -459,6 +472,7 @@ class ChartEditorState extends UIState {
                             0
                     );
                     addAction(new ElementAddAction([note]));
+                    
                     crosshair.dragTarget = note;
                 }
                 else addAction(new ElementAddAction([new GuiEventNote(
@@ -467,12 +481,11 @@ class ChartEditorState extends UIState {
                         [['Add Camera Zoom', '', '']])])
                     );  
             }
-
-            if (Std.isOfType(crosshair.dragTarget, GuiNote) && crosshair.dragTarget != null) {
-                var note:GuiNote = cast (lastTarget, GuiNote);
-                if (FlxG.mouse.pressed)
+            if (FlxG.mouse.pressed && !FlxG.keys.pressed.SHIFT)
+                if (Std.isOfType(crosshair.dragTarget, GuiNote) && crosshair.dragTarget != null && crosshair.dragTarget == crosshair.lastTarget) {
+                    var note:GuiNote = cast (crosshair.dragTarget, GuiNote);
                     data[note.dataID].set('susLength', Math.max(0, crosshair.getMousePos() - note.strumTime));
-            }
+                }
 
 
             if (FlxG.keys.justPressed.DELETE) {
@@ -789,6 +802,16 @@ class ChartEditorState extends UIState {
         hudGroup.add(conductorLine);
 
         crosshair = new Crosshair();
+        crosshair.onDragFinished = function () {
+            if (FlxG.keys.pressed.SHIFT && crosshair.visible) {
+                var toDelete:Array<GuiElement> = [];
+                selectIndicator.forEachAlive(function (indicator:SelectIndicator) {
+                    toDelete.push(indicator.target);
+                });
+                addAction(new MoveAction(toDelete));
+            }
+                
+        }
         hudGroup.add(crosshair);
         
         var bottomHeight:Int = 20;
