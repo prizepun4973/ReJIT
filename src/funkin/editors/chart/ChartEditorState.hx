@@ -96,6 +96,9 @@ class ChartEditorState extends UIState {
     private var textPanel:FlxText;
     private var textPanel1:FlxText;
 
+    public var lastTarget:GuiElement;
+    public var canDrag:Bool = true;
+
     private var songPos(get, never):Float;
     function get_songPos():Float {
         return Conductor.songPosition;
@@ -474,6 +477,7 @@ class ChartEditorState extends UIState {
                     addAction(new ElementAddAction([note]));
                     
                     crosshair.dragTarget = note;
+                    canDrag = true;
                 }
                 else addAction(new ElementAddAction([new GuiEventNote(
                         true, 
@@ -481,8 +485,11 @@ class ChartEditorState extends UIState {
                         [['Add Camera Zoom', '', '']])])
                     );  
             }
+
+            if (FlxG.mouse.justReleased) canDrag = false;
+
             if (FlxG.mouse.pressed && !FlxG.keys.pressed.SHIFT)
-                if (Std.isOfType(crosshair.dragTarget, GuiNote) && crosshair.dragTarget != null && crosshair.dragTarget == crosshair.lastTarget) {
+                if (Std.isOfType(crosshair.dragTarget, GuiNote) && crosshair.dragTarget != null && crosshair.dragTarget == lastTarget && canDrag) {
                     var note:GuiNote = cast (crosshair.dragTarget, GuiNote);
                     data[note.dataID].set('susLength', Math.max(0, crosshair.getMousePos() - note.strumTime));
                 }

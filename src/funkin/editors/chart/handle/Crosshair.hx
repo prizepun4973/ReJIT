@@ -11,7 +11,7 @@ class Crosshair extends FlxSprite {
     public var chained:Bool = true;
 
     public var dragTarget:GuiElement;
-    public var lastTarget:GuiElement;
+    
 
     public var offsetX:Float;
     public var offsetY:Float;
