@@ -19,6 +19,7 @@ import funkin.game.component.Note.EventNote;
 import funkin.game.data.StageData;
 import funkin.game.data.Section;
 import funkin.game.data.Section.SwagSection;
+import funkin.game.component.HealthIcon;
 
 import haxe.ui.core.Component;
 
@@ -59,6 +60,9 @@ class ChartEditorState extends UIState {
 
     public static var clipBoard:Array<Int> = [];
 
+    public static var hitsoundP1:Bool = true;
+    public static var hitsoundP2:Bool = true;
+
     public var paused:Bool = true;
     public static var beatSnap:Int;
 
@@ -92,6 +96,8 @@ class ChartEditorState extends UIState {
     private var sectionStopLine:FlxSprite;
     private var beatSplitLine:Array<FlxSprite> = [];
     public var crosshair:Crosshair;
+    public var iconP1:HealthIcon;
+    public var iconP2:HealthIcon;
 
     private var textPanel:FlxText;
     private var textPanel1:FlxText;
@@ -113,6 +119,8 @@ class ChartEditorState extends UIState {
         redos = [];
         data = [];
         beatSnap = 16;
+        hitsoundP1 = true;
+        hitsoundP2 = true;
     }
 
     public function canInput() {
@@ -681,6 +689,13 @@ class ChartEditorState extends UIState {
                             addAction(new NoteTypeAction(datas, typeTextBox.getText()));
                         }
                 }
+            case "Options":
+                switch(line) {
+                    case "Toggle Player Hitsound":
+                        hitsoundP1 = !hitsoundP1;
+                    case "Toggle Opponent Hitsound":
+                        hitsoundP2 = !hitsoundP2;
+                }
         }
     }
 
@@ -837,16 +852,29 @@ class ChartEditorState extends UIState {
         hudGroup.add(textPanel1);
 
         tab = new UIState.Tabs(this,
-            ['File', 'Edit', 'Help'], [
+            ['File', 'Edit', 'Options', 'Help'], [
 
             ['Edit Chart Data', 'Save', 'Save Event', 'Save As', 'Save Event As', 'Reload Audio', 'Reload Chart', 'Load Events', 'Exit'], 
             ['Edit Current Section', 'Edit Selected Notes', 'Go To'],
+            ['Toggle Player Hitsound', 'Toggle Opponent Hitsound'],
             ['Instructions']
         ]);
 
         tab.onClick = function (column:String, line:String) {
             tabAction(column, line);
         };
+
+        hudGroup.add(new FlxSprite(nextGridBG.x, 20).makeGraphic(GRID_SIZE * 8, 114, 0x640F0F0F));
+        iconP1 = new HealthIcon(_song.player1);
+        iconP1.screenCenter(X);
+        iconP1.x += 80;
+        iconP1.scale.set(0.75, 0.75);
+        hudGroup.add(iconP1);
+        iconP2 = new HealthIcon(_song.player2);
+        iconP2.screenCenter(X);
+        iconP2.x -= 70;
+        iconP2.scale.set(0.75, 0.75);
+        hudGroup.add(iconP2);
 
         updateGrid();
 

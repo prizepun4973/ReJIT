@@ -2,6 +2,7 @@ package funkin.editors.chart.element;
 
 import funkin.editors.chart.ChartEditorState;
 import flixel.FlxSprite;
+import flixel.FlxG;
 import flixel.text.FlxText;
 
 class GuiNote extends GuiElement{
@@ -11,6 +12,8 @@ class GuiNote extends GuiElement{
     
     public var susTail:FlxSprite;
     public var typeTxt:FlxText;
+
+    var playHitsound:Bool = false;
 
     public function new(pushData:Bool, strumTime:Float, noteData:Int, susLength:Float, noteType:String = '') {
         super(strumTime);
@@ -82,5 +85,13 @@ class GuiNote extends GuiElement{
         susTail.visible = susLength > 0;
         susTail.alpha = alpha;
         susTail.setGraphicSize(susTail.width, ChartEditorState.GRID_SIZE * (susLength / crochet * 4 + 0.5)); // TODO: Fix this
+
+        if (Conductor.songPosition <= strumTime) playHitsound = true;
+        else if (playHitsound) {
+            if ((ChartEditorState.hitsoundP1 && noteData > 3) || (ChartEditorState.hitsoundP2 && noteData < 4)) {
+                playHitsound = false;
+                FlxG.sound.play(Paths.sound('hitSound'));
+            }
+        }
     }
 }
