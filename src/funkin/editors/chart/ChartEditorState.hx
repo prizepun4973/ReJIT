@@ -242,7 +242,7 @@ class ChartEditorState extends UIState {
             lastUpdateTime = nextUpdateTime;
             nextUpdateTime += _song.notes[curSec].sectionBeats * Conductor.crochet;
 
-            if (curSec < _song.notes.length)
+            if (curSec < _song.notes.length - 1)
                 sectionStopLine.color = _song.notes[curSec + 1].mustHitSection? FlxColor.fromRGB(49, 176, 209) : FlxColor.fromRGB(175, 102, 206);
             
             if (curSec > 0)
@@ -256,7 +256,7 @@ class ChartEditorState extends UIState {
             Conductor.changeBPM(sectionBPM[curSec]);
 
             nextUpdateTime = lastUpdateTime;
-            lastUpdateTime -= _song.notes[curSec].sectionBeats * Conductor.crochet;
+            lastUpdateTime -= Math.min(_song.notes[curSec].sectionBeats * Conductor.crochet, FlxG.sound.music.length);
         }
 
         gridBG.scale.y = _song.notes[curSec].sectionBeats / 4;
@@ -660,11 +660,9 @@ class ChartEditorState extends UIState {
                             if (Std.isOfType(indicator.target, GuiNote)) {
                                 shouldQuit = false;
                                 var note:GuiNote = cast (indicator.target, GuiNote);
-                                trace(note.noteType);
                                 if (prevType != note.noteType) {
                                     if (prevType == null) {
                                         prevType = note.noteType;
-                                        trace(prevType);
                                     }
                                     else isCommon = false;
                                 }
@@ -790,7 +788,7 @@ class ChartEditorState extends UIState {
         for (section in _song.notes) {
             for (note in section.sectionNotes) {
                 var guiNote:GuiNote = new GuiNote(true, note[0], Std.int(section.mustHitSection ? (note[1] < 4 ? note[1] + 4 : note[1] - 4) : note[1]), note[2]);
-                if (note.length > 3) if (Std.isOfType(note[3], String)) guiNote.noteType = note[3];
+                if (note.length > 3) if (Std.isOfType(note[3], String)) data[guiNote.dataID].set('noteType', note[3]);
             }
         }
 
@@ -820,7 +818,7 @@ class ChartEditorState extends UIState {
         sectionStopLine = new FlxSprite(0, Y_OFFSET).makeGraphic(GRID_SIZE * 8, 2, FlxColor.WHITE);
         sectionStopLine.screenCenter(X);
 
-        if (curSec < _song.notes.length)
+        if (curSec < _song.notes.length - 1)
             sectionStopLine.color = _song.notes[curSec + 1].mustHitSection? FlxColor.fromRGB(49, 176, 209) : FlxColor.fromRGB(175, 102, 206);
 
         hudGroup.add(sectionStopLine);

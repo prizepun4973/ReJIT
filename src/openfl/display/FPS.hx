@@ -55,6 +55,10 @@ class FPS extends TextField
 		currentTime = 0;
 		times = [];
 
+		background = true;
+		backgroundColor = 0xFF0F0F0F;
+		alpha = 0.5;
+
 		#if flash
 		addEventListener(Event.ENTER_FRAME, function(e)
 		{

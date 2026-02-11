@@ -59,7 +59,7 @@ class GuiEventNote extends GuiElement {
 
         displayText.text = result;
         displayText.x = x - displayText.width - 10 + ChartEditorState.GRID_SIZE * 1.5;
-        displayText.y = y - 2.5 + ChartEditorState.GRID_SIZE * 1.5;
+        displayText.y = y - 5 + ChartEditorState.GRID_SIZE * 1.5;
 
         alpha = strumTime < Conductor.songPosition ? 0.6 : 1;
     }

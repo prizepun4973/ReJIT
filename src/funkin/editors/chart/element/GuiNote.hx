@@ -49,7 +49,12 @@ class GuiNote extends GuiElement{
         animation.addByPrefix("7", "red0");
 
         parent.add(susTail);
+
         parent.add(this);
+        
+        typeTxt = new FlxText(0, 0, 60, '', 12);
+        typeTxt.setFormat(Paths.font("vcr.ttf"), 16, 0xFFE0E0E0, CENTER, FlxTextBorderStyle.OUTLINE, flixel.util.FlxColor.BLACK);
+        parent.add(typeTxt);
 
         updatePos();
     }
@@ -85,6 +90,10 @@ class GuiNote extends GuiElement{
         susTail.visible = susLength > 0;
         susTail.alpha = alpha;
         susTail.setGraphicSize(susTail.width, ChartEditorState.GRID_SIZE * (susLength / crochet * 4 + 0.5)); // TODO: Fix this
+
+        typeTxt.text = noteType;
+        typeTxt.x = x + ChartEditorState.GRID_SIZE * 1.5 - 10;
+        typeTxt.y = y + ChartEditorState.GRID_SIZE * 1.5 - 5;
 
         if (Conductor.songPosition <= strumTime) playHitsound = true;
         else if ((ChartEditorState.hitsoundP1 && noteData > 3) || (ChartEditorState.hitsoundP2 && noteData < 4)) {
