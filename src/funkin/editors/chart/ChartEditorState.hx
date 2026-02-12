@@ -373,6 +373,9 @@ class ChartEditorState extends UIState {
             Conductor.songPosition -= Conductor.crochet * FlxG.mouse.wheel;
         if (FlxG.keys.justPressed.SPACE) pause();
 
+        if (FlxG.keys.pressed.CONTROL && FlxG.mouse.justPressedRight && crosshair.target != null && Std.isOfType(crosshair.target, GuiEventNote))
+            openSubState(new EventEditScreen(cast (crosshair.target, GuiEventNote)));
+
         // selection
         if (FlxG.mouse.justPressed && crosshair.target != null) {
             if (FlxG.keys.pressed.CONTROL) {

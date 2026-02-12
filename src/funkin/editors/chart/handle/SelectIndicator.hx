@@ -25,5 +25,8 @@ class SelectIndicator extends FlxSprite {
     function updatePos() {
         x = target.x - ChartEditorState.INSTANCE.crosshair.offsetX + ChartEditorState.GRID_SIZE * 1.5 - 2;
         y = target.y - ChartEditorState.INSTANCE.crosshair.offsetY + ChartEditorState.GRID_SIZE * 1.5;
+
+        if (Std.isOfType(target, GuiNote))
+            target.offset.set(ChartEditorState.INSTANCE.crosshair.offsetX, ChartEditorState.INSTANCE.crosshair.offsetY);
     }
 }
