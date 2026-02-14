@@ -28,4 +28,12 @@ class ButtonWidget extends flixel.FlxSprite {
         if (CoolUtil.mouseInRange(x, x + width, y, y + height) && FlxG.mouse.justReleased)
             onClick();
     }
+
+    public function setText(_text:String) {
+        text.text = _text;
+    }
+
+    public function getText() {
+        return text.text;
+    }
 }
